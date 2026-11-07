@@ -246,6 +246,15 @@ async function api(action, data) {
   return j;
 }
 
+// angka dari Google Sheet (misalnya jawaban "1928") dijadikan teks
+function rapikan() {
+  const teks = (list, kolom) => list.forEach(x => kolom.forEach(k => { x[k] = x[k] == null ? '' : String(x[k]); }));
+  teks(S.data.orang, ['ID', 'Nama', 'Panggilan', 'JK', 'Ayah', 'Ibu', 'Pasangan', 'Saudara', 'Hubungan', 'Konteks', 'Jembatan', 'Catatan', 'hub']);
+  teks(S.data.fakta, ['ID', 'Kategori', 'Pertanyaan', 'Jawaban', 'Penjelasan', 'Pengecoh']);
+  teks(S.data.tips, ['ID', 'Kategori', 'Judul', 'Isi']);
+  teks(S.data.skenario, ['ID', 'Situasi', 'PilihanA', 'PilihanB', 'PilihanC', 'Kunci', 'Penjelasan']);
+}
+
 // ---------- data keluarga ----------
 function indeks() {
   S.idx = {};
@@ -298,6 +307,7 @@ async function mulai() {
   if (!tg || !tg.initData) return layarPesan('Buka lewat Telegram', 'Aplikasi ini hanya bisa dibuka dari tombol Latihan di bot Telegram-mu.');
   try {
     S.data = await api('boot');
+    rapikan();
     indeks();
     $('#nav').hidden = false;
     render();
@@ -418,8 +428,14 @@ function siapkanKartu() {
     k.kunci = o.Nama;
   } else {
     const f = k.o;
-    const pool = acak(S.data.fakta.filter(x => x.ID !== f.ID && x.Kategori === f.Kategori && norm(x.Jawaban) !== norm(f.Jawaban)).map(x => x.Jawaban));
-    const unik = pool.filter((v, i) => pool.indexOf(v) === i).slice(0, 3);
+    // utamakan pengecoh buatan yang sejenis dengan jawaban
+    let unik = acak(String(f.Pengecoh || '').split(';').map(x => x.trim()).filter(x => x && norm(x) !== norm(f.Jawaban))).slice(0, 3);
+    if (unik.length < 3) {
+      // cadangan: jawaban fakta lain di kategori sama yang jenisnya mirip (sama-sama angka, atau kata pertamanya sama)
+      const jenis = t => /^\d/.test(t) ? '#angka' : norm(t).split(' ')[0];
+      const pool = acak(S.data.fakta.filter(x => x.ID !== f.ID && x.Kategori === f.Kategori && norm(x.Jawaban) !== norm(f.Jawaban) && jenis(x.Jawaban) === jenis(f.Jawaban)).map(x => x.Jawaban));
+      unik = pool.filter((v, i) => pool.indexOf(v) === i).slice(0, 3);
+    }
     k.mode = unik.length >= 3 ? 'pilih' : 'balik';
     k.opsi = acak(unik.concat([f.Jawaban]));
     k.kunci = f.Jawaban;
@@ -463,7 +479,7 @@ function tulisLontar(teks) {
   const el = $('#tulisan');
   if (!el) return;
   el.classList.remove('kosong');
-  el.innerHTML = Array.from(teks).map((c, i) => '<span class="huruf" style="animation-delay:' + (i * 28) + 'ms">' + (c === ' ' ? '&nbsp;' : esc(c)) + '</span>').join('');
+  el.innerHTML = Array.from(String(teks)).map((c, i) => '<span class="huruf" style="animation-delay:' + (i * 28) + 'ms">' + (c === ' ' ? '&nbsp;' : esc(c)) + '</span>').join('');
 }
 
 function pilih(i) {

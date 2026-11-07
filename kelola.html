@@ -488,9 +488,10 @@ const BENTUK = {
     baru: 'Fakta baru', kosong: 'Belum ada fakta. Tambahkan hal baru yang kamu pelajari hari ini.',
     judul: x => x.Pertanyaan, sub: x => (x.Kategori ? x.Kategori + ': ' : '') + x.Jawaban,
     field: [
-      { k: 'Kategori', l: 'Kategori', t: 'daftar', p: 'Contoh: Geografi', h: 'Fakta dengan kategori sama dipakai sebagai pilihan jawaban satu sama lain. Minimal 4 fakta per kategori supaya jadi pilihan ganda.' },
+      { k: 'Kategori', l: 'Kategori', t: 'daftar', p: 'Contoh: Geografi', h: 'Contoh: Kesehatan, Pertanian, Sejarah Dunia.' },
       { k: 'Pertanyaan', l: 'Pertanyaan', t: 'area', w: 1, p: 'Contoh: Gunung tertinggi di Bali?' },
       { k: 'Jawaban', l: 'Jawaban', t: 'text', w: 1, p: 'Contoh: Gunung Agung' },
+      { k: 'Pengecoh', l: 'Pilihan jawaban yang salah', t: 'text', p: 'Contoh: Gunung Batur; Gunung Batukaru; Gunung Abang', h: 'Pisahkan dengan titik koma. Buat yang sejenis supaya tidak mudah ditebak. Kalau dikosongkan, soal muncul sebagai kartu balik (tebak lalu lihat jawaban).' },
       { k: 'Penjelasan', l: 'Penjelasan singkat', t: 'area', h: 'Muncul setelah kamu menjawab.' }
     ]
   },
