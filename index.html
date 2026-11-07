@@ -9,6 +9,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="config.js"></script>
+<script>
+// pasang tema sedini mungkin supaya tidak berkedip
+(function(){try{var p=localStorage.getItem('ingat_tema')||'otomatis';var tg=window.Telegram&&Telegram.WebApp;
+var gelap=p==='gelap'||(p==='otomatis'&&(tg&&tg.colorScheme?tg.colorScheme==='dark':matchMedia('(prefers-color-scheme: dark)').matches));
+document.documentElement.dataset.tema=gelap?'gelap':'terang';}catch(e){document.documentElement.dataset.tema='gelap';}})();
+</script>
 <style>
 :root{
   --malam:#1B2440; --malam2:#232F55; --malam3:#2C3A66; --garis:#38467A;
@@ -38,10 +44,10 @@ h2{font-size:22px} h3{font-size:18px}
 
 /* navigasi bawah */
 nav{position:fixed;left:0;right:0;bottom:0;height:calc(var(--nav) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);
-  background:rgba(27,36,64,.96);backdrop-filter:blur(8px);border-top:1px solid var(--garis);display:flex;z-index:20}
+  background:var(--nav-bg);backdrop-filter:blur(8px);border-top:1px solid var(--garis);display:flex;z-index:20}
 nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;font-weight:600;color:var(--redup)}
 nav button svg{width:22px;height:22px}
-nav button[aria-current="page"]{color:var(--emas)}
+nav button[aria-current="page"]{color:var(--emas-teks)}
 
 /* tombol */
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px 18px;border-radius:14px;font-weight:700;font-size:16px}
@@ -52,7 +58,7 @@ nav button[aria-current="page"]{color:var(--emas)}
 .baris-btn .btn{flex:1}
 
 /* panel */
-.panel{background:var(--malam2);border:1px solid var(--garis);border-radius:18px;padding:18px}
+.panel{background:var(--malam2);border:1px solid var(--garis);border-radius:20px;padding:20px;box-shadow:var(--bayang-halus)}
 .jarak{height:16px}
 
 /* minggu */
@@ -61,14 +67,14 @@ nav button[aria-current="page"]{color:var(--emas)}
 .minggu .batang{width:100%;max-width:26px;border-radius:6px;background:var(--malam3);min-height:6px;position:relative;overflow:hidden}
 .minggu .batang i{position:absolute;left:0;right:0;bottom:0;background:var(--emas);border-radius:6px}
 .minggu .hari span{font-size:11px;color:var(--redup)}
-.minggu .hari.kini span{color:var(--emas);font-weight:700}
+.minggu .hari.kini span{color:var(--emas-teks);font-weight:700}
 
 /* LONTAR: kartu latihan — elemen paling khas */
 .lontar{position:relative;background:
    repeating-linear-gradient(180deg,rgba(120,90,40,.10) 0 1px,transparent 1px 7px),
    linear-gradient(180deg,#EFE0B8,var(--lontar) 55%,var(--lontar-gelap));
   color:var(--tinta);border-radius:999px/28px;padding:16px 56px;min-height:72px;display:flex;align-items:center;justify-content:center;text-align:center;
-  box-shadow:inset 0 -3px 0 rgba(90,60,20,.18),0 10px 30px rgba(0,0,0,.35)}
+  box-shadow:inset 0 -3px 0 rgba(90,60,20,.18),var(--bayang)}
 .lontar::before,.lontar::after{content:'';position:absolute;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;
   background:var(--malam);box-shadow:inset 0 1px 2px rgba(0,0,0,.6)}
 .lontar::before{left:24px}.lontar::after{right:24px}
@@ -85,41 +91,42 @@ nav button[aria-current="page"]{color:var(--emas)}
 .bingkai{position:relative;width:min(72vw,280px);aspect-ratio:1;margin:6px auto -26px;border-radius:24px;overflow:hidden;
   border:3px solid var(--emas-redup);background:var(--malam3);z-index:1}
 .bingkai img{width:100%;height:100%;object-fit:cover}
-.tanya{background:var(--malam2);border:1px solid var(--garis);border-radius:20px;padding:22px 20px 40px;margin-bottom:-26px;position:relative;z-index:1;text-align:center}
-.tanya .label{font-size:13px;color:var(--emas);font-weight:600;margin-bottom:8px}
+.tanya{background:var(--malam2);border:1px solid var(--garis);box-shadow:var(--bayang-halus);border-radius:22px;padding:22px 20px 40px;margin-bottom:-26px;position:relative;z-index:1;text-align:center}
+.tanya .label{font-size:13px;color:var(--emas-teks);font-weight:600;margin-bottom:8px}
 .tanya .isi{font-family:var(--serif);font-size:20px;line-height:1.4}
 .kartu-sesi .lontar{position:relative;z-index:2;margin:0 4px}
 .pilihan{display:flex;flex-direction:column;gap:10px;margin-top:18px}
-.pilihan button{text-align:left;padding:14px 16px;border-radius:14px;background:var(--malam2);border:1px solid var(--garis);font-weight:600;transition:background .2s,border-color .2s}
+.pilihan button{text-align:left;padding:15px 18px;border-radius:16px;background:var(--malam2);border:1px solid var(--garis);font-weight:600;box-shadow:var(--bayang-halus);transition:background .2s,border-color .2s,transform .1s}
 .pilihan button:active{transform:scale(.99)}
 .pilihan button.benar{background:rgba(95,184,154,.18);border-color:var(--giok)}
 .pilihan button.salah{background:rgba(224,122,122,.16);border-color:var(--mawar)}
 .pilihan button[disabled]{cursor:default}
 .pilihan .btn{text-align:center;justify-content:center}
-.pilihan .btn-emas{background:var(--emas);color:#2A1E05;border-color:var(--emas)}
+.pilihan .btn-emas{background:var(--emas);color:#2A1E05;border-color:var(--emas-teks)}
 .hasil{margin-top:16px;padding:16px;border-radius:16px;background:var(--malam2);border:1px solid var(--garis)}
 .hasil .vonis{font-weight:700;margin-bottom:6px}
 .vonis.ok{color:var(--giok)} .vonis.no{color:var(--mawar)}
 .info-baris{display:flex;gap:10px;margin-top:8px;font-size:15px}
 .info-baris b{color:var(--redup);font-weight:600;min-width:84px;flex-shrink:0}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(224,176,75,.14);color:var(--emas);font-size:13px;font-weight:700}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(224,176,75,.14);color:var(--emas-teks);font-size:13px;font-weight:700}
 
 /* galeri orang */
 .cari{width:100%;padding:13px 16px;border-radius:14px;border:1px solid var(--garis);background:var(--malam2);color:var(--teks);font:inherit}
 .cari::placeholder{color:var(--redup)}
 .saring{display:flex;gap:8px;margin:12px 0 16px;overflow-x:auto}
 .saring button{padding:8px 14px;border-radius:999px;border:1px solid var(--garis);font-size:14px;font-weight:600;white-space:nowrap}
-.saring button[aria-pressed="true"]{background:var(--emas);color:#2A1E05;border-color:var(--emas)}
+.saring button[aria-pressed="true"]{background:var(--emas);color:#2A1E05;border-color:var(--emas-teks)}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 12px}
 .orang{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
 .ava{width:100%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:var(--malam3);display:flex;align-items:center;justify-content:center;
-  font-family:var(--serif);font-weight:700;font-size:26px;color:var(--lontar);border:2px solid var(--garis)}
+  font-family:var(--serif);font-weight:700;font-size:26px;color:var(--monogram);border:2px solid var(--garis)}
 .ava img{width:100%;height:100%;object-fit:cover}
 .orang .nm{font-size:13px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.orang .hb{font-size:12px;color:var(--emas);margin-top:-4px}
+.judul-grup{font-size:17px;margin:22px 0 12px;display:flex;align-items:baseline;gap:8px}
+.orang .hb{font-size:12px;color:var(--emas-teks);margin-top:-4px}
 
 /* lembar detail */
-.tirai{position:fixed;inset:0;background:rgba(10,14,28,.6);z-index:40;opacity:0;pointer-events:none;transition:opacity .25s}
+.tirai{position:fixed;inset:0;background:var(--tirai);z-index:40;opacity:0;pointer-events:none;transition:opacity .25s}
 .tirai.buka{opacity:1;pointer-events:auto}
 .lembar{position:fixed;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:var(--malam);border-radius:24px 24px 0 0;border-top:1px solid var(--garis);
   z-index:41;transform:translateY(100%);visibility:hidden;transition:transform .3s cubic-bezier(.2,.8,.2,1),visibility 0s .3s;padding:10px 18px calc(24px + env(safe-area-inset-bottom))}
@@ -153,19 +160,19 @@ nav button[aria-current="page"]{color:var(--emas)}
 .pasangan-simpul{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .org-simpul{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border-radius:999px;background:var(--malam2);border:1px solid var(--garis);font-size:14px;font-weight:600;text-align:left}
 .org-simpul .ava{width:30px;height:30px;font-size:13px;border-width:1px}
-.org-simpul.saya{border-color:var(--emas);box-shadow:0 0 0 2px rgba(224,176,75,.25)}
-.nikah{color:var(--emas);font-size:14px}
+.org-simpul.saya{border-color:var(--emas-teks);box-shadow:0 0 0 2px rgba(224,176,75,.25)}
+.nikah{color:var(--emas-teks);font-size:14px}
 .pas-wrap{display:inline-flex;align-items:center;gap:6px}
 .kilat{animation:kilat 1.4s ease}
 @keyframes kilat{0%,100%{background:transparent}30%{background:rgba(224,176,75,.18)}}
 
 /* ngobrol */
 .tip-judul{font-size:20px;margin:6px 0 8px}
-.kat{font-size:13px;color:var(--emas);font-weight:600}
+.kat{font-size:13px;color:var(--emas-teks);font-weight:600}
 .situasi{font-family:var(--serif);font-size:19px;line-height:1.45;margin:8px 0 4px}
 .rak summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--garis);font-weight:700}
 .rak summary::-webkit-details-marker{display:none}
-.rak[open] summary{color:var(--emas)}
+.rak[open] summary{color:var(--emas-teks)}
 .rak .tip{padding:12px 0;border-bottom:1px solid rgba(56,70,122,.5)}
 .rak .tip b{display:block;margin-bottom:2px}
 
@@ -174,6 +181,7 @@ nav button[aria-current="page"]{color:var(--emas)}
 .denyut{animation:denyut 1.6s ease-in-out infinite}
 @keyframes denyut{50%{opacity:.45}}
 .skor{font-family:var(--serif);font-size:56px;font-weight:700;line-height:1}
+.toast.ok{background:var(--giok);color:#fff}
 .toast{position:fixed;left:50%;bottom:calc(var(--nav) + 18px);transform:translateX(-50%);background:var(--mawar);color:#2a0b0b;font-weight:700;padding:10px 16px;border-radius:12px;z-index:60;font-size:14px;max-width:90vw}
 canvas#konfeti{position:fixed;inset:0;pointer-events:none;z-index:70}
 [hidden]{display:none !important}
@@ -181,6 +189,15 @@ canvas#konfeti{position:fixed;inset:0;pointer-events:none;z-index:70}
 @media (prefers-reduced-motion: reduce){
   *{animation-duration:.01ms !important;transition-duration:.01ms !important}
 }
+
+:root{--emas-teks:#E0B04B;--monogram:#EAD9AE;--nav-bg:rgba(27,36,64,.94);--tirai:rgba(10,14,28,.6);--bayang:0 10px 30px rgba(0,0,0,.35);--bayang-halus:0 1px 0 rgba(255,255,255,.03);color-scheme:dark}
+:root[data-tema="terang"]{--malam:#F3F4F9;--malam2:#FFFFFF;--malam3:#E9ECF5;--garis:#DCE0EC;--teks:#1B2440;--redup:#5E6886;
+  --emas-teks:#8F6216;--emas-redup:#C9A55A;--giok:#23825F;--mawar:#B9464A;--monogram:#6B5428;
+  --nav-bg:rgba(255,255,255,.92);--tirai:rgba(27,36,64,.32);--bayang:0 12px 28px rgba(27,36,64,.12);--bayang-halus:0 1px 2px rgba(27,36,64,.06);color-scheme:light}
+html,body{transition:background-color .25s ease,color .25s ease}
+.tombol-tema{width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--garis);background:var(--malam2);color:var(--redup)}
+.tombol-tema svg{width:18px;height:18px}
+.kanan{display:flex;align-items:center;gap:8px}
 </style>
 </head>
 <body>
@@ -217,6 +234,38 @@ const S = { data: null, idx: {}, tab: 'latihan', sesi: null, filter: 'semua', ca
 const $ = (s, el) => (el || document).querySelector(s);
 const app = $('#app');
 
+
+// ---------- tema terang / gelap ----------
+const LABEL_TEMA = { otomatis: 'Otomatis', terang: 'Terang', gelap: 'Gelap' };
+const IKON_TEMA = {
+  otomatis: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>',
+  terang: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+  gelap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>'
+};
+function temaPilihan() { try { return localStorage.getItem('ingat_tema') || 'otomatis'; } catch (e) { return 'otomatis'; } }
+function tombolTema() {
+  const p = temaPilihan();
+  return '<button class="tombol-tema" type="button" title="Tema: ' + LABEL_TEMA[p] + '" aria-label="Ganti tema, sekarang ' + LABEL_TEMA[p] + '">' + IKON_TEMA[p] + '</button>';
+}
+function terapkanTema() {
+  const p = temaPilihan();
+  const tgw = window.Telegram && window.Telegram.WebApp;
+  const gelap = p === 'gelap' || (p === 'otomatis' && (tgw && tgw.colorScheme && tgw.initData ? tgw.colorScheme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches));
+  document.documentElement.dataset.tema = gelap ? 'gelap' : 'terang';
+  const bg = gelap ? '#1B2440' : '#F3F4F9';
+  try { tgw.setHeaderColor(bg); tgw.setBackgroundColor(bg); if (tgw.setBottomBarColor) tgw.setBottomBarColor(bg); } catch (e) { }
+  document.querySelectorAll('.tombol-tema').forEach(b => { b.outerHTML = tombolTema(); });
+}
+function gantiTema() {
+  const urut = ['otomatis', 'terang', 'gelap'];
+  const p = urut[(urut.indexOf(temaPilihan()) + 1) % urut.length];
+  try { localStorage.setItem('ingat_tema', p); } catch (e) { }
+  terapkanTema();
+  toast('Tema: ' + LABEL_TEMA[p], true);
+}
+document.addEventListener('click', e => { if (e.target.closest('.tombol-tema')) gantiTema(); });
+try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', terapkanTema); } catch (e) { }
+
 // ---------- utilitas ----------
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -232,9 +281,9 @@ function monogram(o) {
 function ava(o) {
   return '<span class="ava">' + (o.Foto ? '<img src="' + o.Foto + '" alt="" loading="lazy">' : esc(monogram(o))) + '</span>';
 }
-function toast(msg) {
+function toast(msg, ok) {
   const t = document.createElement('div');
-  t.className = 'toast'; t.textContent = msg; document.body.appendChild(t);
+  t.className = 'toast' + (ok ? ' ok' : ''); t.textContent = msg; document.body.appendChild(t);
   setTimeout(() => t.remove(), 3200);
 }
 const jatuhTempo = o => !o.JatuhTempo || new Date(o.JatuhTempo) <= new Date();
@@ -249,7 +298,7 @@ async function api(action, data) {
 // angka dari Google Sheet (misalnya jawaban "1928") dijadikan teks
 function rapikan() {
   const teks = (list, kolom) => list.forEach(x => kolom.forEach(k => { x[k] = x[k] == null ? '' : String(x[k]); }));
-  teks(S.data.orang, ['ID', 'Nama', 'Panggilan', 'JK', 'Ayah', 'Ibu', 'Pasangan', 'Saudara', 'Hubungan', 'Konteks', 'Jembatan', 'Catatan', 'hub']);
+  teks(S.data.orang, ['ID', 'Nama', 'Panggilan', 'JK', 'Ayah', 'Ibu', 'Pasangan', 'Saudara', 'Hubungan', 'Kelompok', 'Konteks', 'Jembatan', 'Catatan', 'hub']);
   teks(S.data.fakta, ['ID', 'Kategori', 'Pertanyaan', 'Jawaban', 'Penjelasan', 'Pengecoh']);
   teks(S.data.tips, ['ID', 'Kategori', 'Judul', 'Isi']);
   teks(S.data.skenario, ['ID', 'Situasi', 'PilihanA', 'PilihanB', 'PilihanC', 'Kunci', 'Penjelasan']);
@@ -300,7 +349,8 @@ function deskripsi(o) {
 async function mulai() {
   if (tg) {
     tg.ready(); tg.expand();
-    try { tg.setHeaderColor('#1B2440'); tg.setBackgroundColor('#1B2440'); tg.setBottomBarColor && tg.setBottomBarColor('#1B2440'); } catch (e) { }
+    terapkanTema();
+    try { tg.onEvent('themeChanged', terapkanTema); } catch (e) { }
     tg.BackButton.onClick(tutupLembar);
   }
   if (!API_URL || API_URL.indexOf('ISI_') === 0) return layarPesan('Alamat server belum diisi', 'Buka file config.js di GitHub dan isi alamat Apps Script-mu.');
@@ -339,6 +389,8 @@ function render() {
   if (S.tab === 'ngobrol') return renderNgobrol();
 }
 
+function kanan(st) { return '<div class="kanan">' + tombolTema() + apiHtml(st) + '</div>'; }
+
 function apiHtml(st) {
   return '<span class="api' + (st.streak ? '' : ' padam') + '" title="Hari beruntun"><svg viewBox="0 0 24 24" fill="' + (st.streak ? '#E0B04B' : 'none') + '" stroke="' + (st.streak ? '#E0B04B' : 'currentColor') + '" stroke-width="1.6"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-7 0 2 1 3 2 3 0-3 0-5 1-8z"/></svg>' + st.streak + '</span>';
 }
@@ -350,7 +402,7 @@ function renderBeranda() {
   const maks = Math.max(5, ...st.minggu.map(m => m.d));
   const kini = new Date();
   const total = S.data.orang.length + S.data.fakta.length;
-  let h = '<div class="kepala"><h1>' + salam() + '</h1>' + apiHtml(st) + '</div>';
+  let h = '<div class="kepala"><h1>' + salam() + '</h1>' + kanan(st) + '</div>';
 
   if (!total) {
     h += '<div class="tengah" style="min-height:50vh"><div class="lontar besar"><div class="tulisan">Masih kosong</div></div>' +
@@ -426,6 +478,13 @@ function siapkanKartu() {
     k.mode = pengecoh.length >= 3 ? 'pilih' : 'balik';
     k.opsi = acak(pengecoh.concat([o.Nama]));
     k.kunci = o.Nama;
+    // sesekali: tebak dia dari kelompok/tempat mana
+    const grupLain = daftarKelompok().filter(g => norm(g) !== norm(o.Kelompok));
+    if (o.Kelompok && grupLain.length >= 3 && Math.random() < 0.4) {
+      k.mode = 'kelompok';
+      k.opsi = acak(acak(grupLain).slice(0, 3).concat([o.Kelompok]));
+      k.kunci = o.Kelompok;
+    }
   } else {
     const f = k.o;
     // utamakan pengecoh buatan yang sejenis dengan jawaban
@@ -455,22 +514,27 @@ function renderSesi() {
   if (k.j === 'orang') {
     if (o.Foto) {
       h += '<div class="bingkai"><img src="' + o.Foto + '" alt="Foto orang yang harus ditebak"></div>';
+    } else if (k.mode === 'kelompok') {
+      h += '<div style="height:8px"></div>';
     } else {
       h += '<div class="tanya"><div class="label">Siapa dia?</div><div class="isi">' + esc(deskripsi(o)) + '</div></div>';
     }
   } else {
     h += '<div class="tanya"><div class="label">' + esc(o.Kategori || 'Pengetahuan umum') + '</div><div class="isi">' + esc(o.Pertanyaan) + '</div></div>';
   }
-  h += '<div class="lontar"><div class="tulisan kosong" id="tulisan">• • •</div></div></div>';
+  h += k.mode === 'kelompok'
+    ? '<div class="lontar"><div class="tulisan" id="tulisan">' + esc(o.Nama) + '</div></div></div>'
+    : '<div class="lontar"><div class="tulisan kosong" id="tulisan">• • •</div></div></div>';
+  if (k.mode === 'kelompok') h += '<p class="redup" style="text-align:center;margin:16px 0 0;font-weight:600">' + esc(o.Panggilan || o.Nama) + ' kerja atau kenal di mana?</p>';
 
-  if (k.mode === 'pilih') {
+  if (k.mode === 'pilih' || k.mode === 'kelompok') {
     h += '<div class="pilihan" id="pilihan">' + k.opsi.map((t, i) => '<button data-i="' + i + '">' + esc(t) + '</button>').join('') + '</div>';
   } else {
     h += '<div class="pilihan" id="pilihan"><button class="btn btn-garis" style="text-align:center" onclick="tunjukkan()">Tunjukkan jawaban</button></div>';
   }
   h += '<div id="hasil"></div>';
   app.innerHTML = h;
-  if (k.mode === 'pilih') {
+  if (k.mode === 'pilih' || k.mode === 'kelompok') {
     app.querySelectorAll('#pilihan button').forEach(b => b.addEventListener('click', () => pilih(Number(b.dataset.i))));
   }
 }
@@ -510,7 +574,7 @@ function nilaiSendiri(benar) {
 function selesaikanKartu(benar, sudahDitulis) {
   const s = S.sesi, k = s.deck[s.i], o = k.o;
   k.dijawab = true;
-  if (!sudahDitulis) tulisLontar(k.kunci);
+  if (!sudahDitulis && k.mode !== 'kelompok') tulisLontar(k.j === 'orang' ? o.Nama : k.kunci);
   getar(benar ? 'ok' : 'no');
   if (!k.ulang) { s.dijawab++; if (benar) s.benar++; }
   if (!benar && !k.ulang) s.deck.push({ j: k.j, o: o, ulang: true, bebas: true });
@@ -524,6 +588,7 @@ function selesaikanKartu(benar, sudahDitulis) {
 
   let h = '<div class="hasil"><div class="vonis ' + (benar ? 'ok' : 'no') + '">' + (benar ? 'Betul.' : 'Belum tepat, nanti diulang sekali lagi.') + '</div>';
   if (k.j === 'orang') {
+    if (o.Kelompok) h += infoBaris('Kelompok', o.Kelompok);
     if (o.Panggilan) h += infoBaris('Panggilan', o.Panggilan);
     if (o.hub) h += '<div style="margin:8px 0 4px"><span class="chip">' + esc(o.hub) + ' bagimu</span></div>';
     if (o.Foto) { const d = deskripsi(o); if (d) h += infoBaris('Siapa', d); }
@@ -569,22 +634,38 @@ async function renderSelesai() {
 }
 
 // ---------- TAB ORANG ----------
+function daftarKelompok() {
+  const peta = {};
+  S.data.orang.forEach(o => { if (o.Kelompok) peta[norm(o.Kelompok)] = peta[norm(o.Kelompok)] || o.Kelompok; });
+  return Object.values(peta).sort((a, b) => a.localeCompare(b));
+}
+
 function renderOrang() {
   const q = norm(S.cari);
   let list = S.data.orang.slice();
-  if (S.filter !== 'semua') list = list.filter(o => o.Jenis === S.filter);
-  if (q) list = list.filter(o => norm(o.Nama + ' ' + o.Panggilan + ' ' + o.Konteks + ' ' + o.hub).indexOf(q) >= 0);
+  if (S.filter === 'keluarga' || S.filter === 'kenalan') list = list.filter(o => o.Jenis === S.filter);
+  else if (S.filter.indexOf('k:') === 0) list = list.filter(o => norm(o.Kelompok) === S.filter.slice(2));
+  if (q) list = list.filter(o => norm(o.Nama + ' ' + o.Panggilan + ' ' + o.Konteks + ' ' + o.Kelompok + ' ' + o.hub).indexOf(q) >= 0);
   list.sort((a, b) => a.Nama.localeCompare(b.Nama));
-  let h = '<div class="kepala"><h1>Orang</h1>' + apiHtml(S.data.stat) + '</div>' +
-    '<input class="cari" id="cari" type="search" placeholder="Cari nama, panggilan, atau tempat kenal" value="' + esc(S.cari) + '" aria-label="Cari orang">' +
-    '<div class="saring">' + [['semua', 'Semua'], ['keluarga', 'Keluarga'], ['kenalan', 'Kenalan']].map(f =>
-      '<button data-f="' + f[0] + '" aria-pressed="' + (S.filter === f[0]) + '">' + f[1] + '</button>').join('') + '</div>';
+  const saringan = [['semua', 'Semua'], ['keluarga', 'Keluarga'], ['kenalan', 'Kenalan']].concat(daftarKelompok().map(g => ['k:' + norm(g), g]));
+  let h = '<div class="kepala"><h1>Orang</h1>' + kanan(S.data.stat) + '</div>' +
+    '<input class="cari" id="cari" type="search" placeholder="Cari nama, kelompok, atau tempat kenal" value="' + esc(S.cari) + '" aria-label="Cari orang">' +
+    '<div class="saring">' + saringan.map(f => '<button data-f="' + esc(f[0]) + '" aria-pressed="' + (S.filter === f[0]) + '">' + esc(f[1]) + '</button>').join('') + '</div>';
+  const kartuOrang = o => '<button class="orang" data-id="' + o.ID + '">' + ava(o) +
+    '<span class="nm">' + esc(o.Panggilan || o.Nama) + '</span>' + (o.hub ? '<span class="hb">' + esc(o.hub) + '</span>' : '') + '</button>';
   if (!list.length) {
     h += '<div class="tengah" style="min-height:40vh"><p class="redup">' + (S.data.orang.length ? 'Tidak ada yang cocok.' : 'Belum ada orang. Tambahkan di Kelola.') + '</p>' +
       (S.data.orang.length ? '' : '<button class="btn btn-emas" style="max-width:240px" onclick="bukaKelola()">Buka Kelola</button>') + '</div>';
+  } else if (S.filter.indexOf('k:') === 0 || !daftarKelompok().length) {
+    h += '<div class="grid">' + list.map(kartuOrang).join('') + '</div>';
   } else {
-    h += '<div class="grid">' + list.map(o => '<button class="orang" data-id="' + o.ID + '">' + ava(o) +
-      '<span class="nm">' + esc(o.Panggilan || o.Nama) + '</span>' + (o.hub ? '<span class="hb">' + esc(o.hub) + '</span>' : '') + '</button>').join('') + '</div>';
+    // dikelompokkan per kelompok/tempat
+    const grup = {};
+    list.forEach(o => { const g = o.Kelompok || ''; (grup[g] = grup[g] || []).push(o); });
+    Object.keys(grup).sort((a, b) => (a === '') - (b === '') || a.localeCompare(b)).forEach(g => {
+      h += '<h2 class="judul-grup">' + esc(g || 'Tanpa kelompok') + ' <span class="redup kecil">' + grup[g].length + '</span></h2>' +
+        '<div class="grid">' + grup[g].map(kartuOrang).join('') + '</div>';
+    });
   }
   app.innerHTML = h;
   const c = $('#cari');
@@ -601,6 +682,7 @@ function bukaOrang(id) {
   const chip = (x, ket) => '<button data-id="' + x.ID + '">' + ava(x) + '<span>' + esc(x.Panggilan || x.Nama) + (ket ? ' <small>' + esc(ket) + '</small>' : '') + '</span></button>';
   let h = '<div class="foto-besar">' + ava(o) + '</div><h2 class="detail-nama">' + esc(o.Nama) + '</h2>';
   if (o.Panggilan) h += '<div class="detail-sub">Dipanggil ' + esc(o.Panggilan) + '</div>';
+  if (o.Kelompok) h += '<div class="detail-sub">' + esc(o.Kelompok) + '</div>';
   if (o.ID === S.data.saya) h += '<div class="detail-hub"><span class="chip">Ini kamu</span></div>';
   else if (o.hub) h += '<div class="detail-hub"><span class="chip">' + esc(o.hub) + ' bagimu</span></div>';
   else if (o.Jenis === 'kenalan') h += '<div class="detail-hub"><span class="chip">Kenalan</span></div>';
@@ -654,7 +736,7 @@ function anakPohon(o) {
 
 function renderPohon() {
   const keluarga = S.data.orang.filter(o => o.Jenis !== 'kenalan');
-  let h = '<div class="kepala"><h1>Pohon keluarga</h1>' + apiHtml(S.data.stat) + '</div>';
+  let h = '<div class="kepala"><h1>Pohon keluarga</h1>' + kanan(S.data.stat) + '</div>';
   if (!keluarga.length) {
     app.innerHTML = h + '<div class="tengah" style="min-height:40vh"><p class="redup">Belum ada anggota keluarga. Tambahkan di Kelola, lalu atur ayah, ibu, dan pasangannya.</p><button class="btn btn-emas" style="max-width:240px" onclick="bukaKelola()">Buka Kelola</button></div>';
     return;
@@ -712,7 +794,7 @@ function lompatKeSaya() {
 
 // ---------- TAB NGOBROL ----------
 function renderNgobrol() {
-  let h = '<div class="kepala"><h1>Ngobrol</h1>' + apiHtml(S.data.stat) + '</div>';
+  let h = '<div class="kepala"><h1>Ngobrol</h1>' + kanan(S.data.stat) + '</div>';
   const tip = tipHariIni();
   if (tip) h += '<div class="panel"><div class="kat">Tips hari ini · ' + esc(tip.Kategori) + '</div><h3 class="tip-judul">' + esc(tip.Judul) + '</h3><p style="margin:0">' + esc(tip.Isi) + '</p></div><div class="jarak"></div>';
   h += '<div class="panel" id="sken"></div><div class="jarak"></div>';
