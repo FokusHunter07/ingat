@@ -261,7 +261,7 @@ function isiDaftarOrang() {
 function bukaForm(id, awal) {
   S.kotor = false;
   S.pilih = id;
-  S.form = id ? salin(S.idx[id]) : Object.assign({ ID: '', Jenis: 'keluarga', Nama: '', Panggilan: '', JK: '', Ayah: '', Ibu: '', Pasangan: '', Konteks: '', Jembatan: '', Catatan: '', Foto: '' }, awal || {});
+  S.form = id ? salin(S.idx[id]) : Object.assign({ ID: '', Jenis: 'keluarga', Nama: '', Panggilan: '', JK: '', Ayah: '', Ibu: '', Pasangan: '', Saudara: '', Hubungan: '', Konteks: '', Jembatan: '', Catatan: '', Foto: '' }, awal || {});
   history.replaceState(null, '', id ? '#orang-' + id : location.pathname);
   isiDaftarOrang();
   renderFormOrang();
@@ -302,6 +302,10 @@ function renderFormOrang() {
   const opsiPas = '<option value="">+ Tambah pasangan…</option>' + keluarga.filter(o => o.ID !== id && pas.indexOf(o.ID) < 0)
     .map(o => '<option value="' + o.ID + '">' + esc(o.Nama) + '</option>').join('');
   const kel = f.Jenis !== 'kenalan';
+  const sd = ids(f.Saudara).filter(p => S.idx[p]);
+  const opsiSd = '<option value="">+ Tambah saudara kandung…</option>' + keluarga.filter(o => o.ID !== id && sd.indexOf(o.ID) < 0 && pas.indexOf(o.ID) < 0)
+    .map(o => '<option value="' + o.ID + '">' + esc(o.Nama) + '</option>').join('');
+  const SARAN_HUB = ['sepupu (misan)', 'sepupu dua kali (mindon)', 'saudara jauh', 'keponakan', 'paman', 'bibi', 'kakek', 'nenek', 'ipar', 'mertua', 'menantu', 'keluarga satu dadia', 'keluarga dari pihak ayah', 'keluarga dari pihak ibu'];
 
   let h = '<div class="isi-form"><div class="kepala-form"><h2>' + (id ? 'Ubah data' : 'Orang baru') + '</h2><button class="btn btn-garis" id="batal">Tutup</button></div>';
   if (id && S.idx[id].hub) h += '<div class="info-hub">' + esc(S.idx[id].hub) + ' bagimu</div>';
@@ -326,6 +330,13 @@ function renderFormOrang() {
     h += '<label class="lbl" for="fPas">Pasangan (suami/istri)</label><div class="chips" id="chipsPas">' +
       pas.map(p => '<span>' + esc(S.idx[p].Nama) + '<button type="button" data-hapus="' + p + '" aria-label="Lepas pasangan">✕</button></span>').join('') + '</div>' +
       '<select id="fPas">' + opsiPas + '</select>';
+    h += '<label class="lbl" for="fSd">Saudara kandung</label><div class="chips" id="chipsSd">' +
+      sd.map(p => '<span>' + esc(S.idx[p].Nama) + '<button type="button" data-hapus="' + p + '" aria-label="Lepas saudara">✕</button></span>').join('') + '</div>' +
+      '<select id="fSd">' + opsiSd + '</select>' +
+      '<p class="petunjuk">Pakai ini kalau orang tuanya belum dicatat. Kalau salah satu saudara sudah punya ayah/ibu, yang lain otomatis ikut. Sepupu dan saudara jauh tidak perlu dipilih di sini: hubungkan lewat orang tuanya, atau isi kolom di bawah.</p>';
+    h += '<label class="lbl" for="fHub">Hubungan denganmu (kalau belum bisa disambungkan)</label><input type="text" id="fHub" list="dlHub" value="' + esc(f.Hubungan) + '" placeholder="Contoh: sepupu dari pihak ibu">' +
+      '<datalist id="dlHub">' + SARAN_HUB.map(x => '<option value="' + esc(x) + '">').join('') + '</datalist>' +
+      '<p class="petunjuk">Dipakai kalau silsilahnya belum lengkap. Begitu tersambung lewat orang tua, sebutan otomatis yang dipakai.</p>';
   }
 
   h += '<label class="lbl" for="fKonteks">' + (kel ? 'Keterangan' : 'Kenal di mana / siapa dia') + '</label><input type="text" id="fKonteks" value="' + esc(f.Konteks) + '" placeholder="' +
@@ -336,7 +347,7 @@ function renderFormOrang() {
     '<button type="button" class="redup kecil" id="tglCatatan" style="margin-top:6px">+ Baris baru dengan tanggal hari ini</button>';
 
   h += '<div class="aksi-bawah"><button class="btn btn-emas" id="simpan">Simpan</button>';
-  if (id && kel) h += '<button class="btn btn-garis" id="tambahAnak">Tambah anak</button>';
+  if (id && kel) h += '<button class="btn btn-garis" id="tambahAnak">Tambah anak</button><button class="btn btn-garis" id="tambahSd">Tambah saudara</button>';
   if (id && kel && id !== S.saya) h += '<button class="btn btn-garis" id="jadiSaya">Ini aku</button>';
   if (id) h += '<button class="btn btn-bahaya kanan" id="hapus">Hapus</button>';
   h += '</div></div>';
@@ -346,7 +357,7 @@ function renderFormOrang() {
   const ambil = () => {
     f.Nama = $('#fNama').value; f.Panggilan = $('#fPanggilan').value; f.Konteks = $('#fKonteks').value;
     f.Jembatan = $('#fJembatan').value; f.Catatan = $('#fCatatan').value;
-    if ($('#fAyah')) { f.Ayah = $('#fAyah').value; f.Ibu = $('#fIbu').value; }
+    if ($('#fAyah')) { f.Ayah = $('#fAyah').value; f.Ibu = $('#fIbu').value; f.Hubungan = $('#fHub').value; }
   };
   kol.querySelectorAll('input,textarea,select').forEach(el => el.addEventListener('input', tandai));
   $('#batal').addEventListener('click', tutupForm);
@@ -363,6 +374,8 @@ function renderFormOrang() {
   if ($('#fPas')) {
     $('#fPas').addEventListener('change', e => { if (!e.target.value) return; ambil(); f.Pasangan = pas.concat([e.target.value]).join(','); renderFormOrang(); S.kotor = true; });
     $('#chipsPas').addEventListener('click', e => { const b = e.target.closest('[data-hapus]'); if (!b) return; ambil(); f.Pasangan = pas.filter(p => p !== b.dataset.hapus).join(','); renderFormOrang(); S.kotor = true; });
+    $('#fSd').addEventListener('change', e => { if (!e.target.value) return; ambil(); f.Saudara = sd.concat([e.target.value]).join(','); renderFormOrang(); S.kotor = true; });
+    $('#chipsSd').addEventListener('click', e => { const b = e.target.closest('[data-hapus]'); if (!b) return; ambil(); f.Saudara = sd.filter(p => p !== b.dataset.hapus).join(','); renderFormOrang(); S.kotor = true; });
   }
   $('#tglCatatan').addEventListener('click', () => {
     const t = $('#fCatatan'); const d = new Date();
@@ -380,6 +393,11 @@ function renderFormOrang() {
     else if (o.JK === 'P') { awal.Ibu = o.ID; if (ps.length === 1 && ps[0].JK !== 'P') awal.Ayah = ps[0].ID; }
     else return toast('Isi dulu jenis kelamin ' + o.Nama + '.');
     S.kotor = false; bukaForm(null, awal);
+  });
+  if ($('#tambahSd')) $('#tambahSd').addEventListener('click', () => {
+    if (!bolehPindah()) return;
+    const o = S.idx[id];
+    S.kotor = false; bukaForm(null, { Jenis: 'keluarga', Ayah: o.Ayah, Ibu: o.Ibu, Saudara: o.ID });
   });
   if ($('#jadiSaya')) $('#jadiSaya').addEventListener('click', () => aturSaya(id));
 }

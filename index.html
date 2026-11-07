@@ -254,8 +254,22 @@ function indeks() {
 const ortuDari = o => [S.idx[o.Ayah], S.idx[o.Ibu]].filter(Boolean);
 const pasDari = o => ids(o.Pasangan).map(id => S.idx[id]).filter(Boolean);
 const anakDari = o => S.data.orang.filter(c => c.Ayah === o.ID || c.Ibu === o.ID);
-const saudaraDari = o => (!o.Ayah && !o.Ibu) ? [] : S.data.orang.filter(x => x.ID !== o.ID && ((o.Ayah && x.Ayah === o.Ayah) || (o.Ibu && x.Ibu === o.Ibu)));
-const bisaDiuji = o => o.ID !== S.data.saya && !!(o.Foto || o.Ayah || o.Ibu || o.Pasangan || o.Konteks || anakDari(o).length);
+function grupSaudara(o) {
+  const hasil = [], antre = [o.ID], seen = {};
+  while (antre.length) {
+    const id = antre.shift();
+    if (seen[id] || !S.idx[id]) continue;
+    seen[id] = 1; hasil.push(S.idx[id]);
+    ids(S.idx[id].Saudara).forEach(x => antre.push(x));
+  }
+  return hasil;
+}
+const saudaraDari = o => {
+  const sd = S.data.orang.filter(x => x.ID !== o.ID && ((o.Ayah && x.Ayah === o.Ayah) || (o.Ibu && x.Ibu === o.Ibu)));
+  grupSaudara(o).forEach(x => { if (x.ID !== o.ID && sd.indexOf(x) < 0) sd.push(x); });
+  return sd;
+};
+const bisaDiuji = o => o.ID !== S.data.saya && !!(o.Foto || o.Ayah || o.Ibu || o.Pasangan || o.Saudara || o.Konteks || anakDari(o).length);
 
 function deskripsi(o) {
   const b = [];
@@ -263,6 +277,10 @@ function deskripsi(o) {
   if (ortu.length) b.push((o.JK === 'L' ? 'Anak laki-laki' : o.JK === 'P' ? 'Anak perempuan' : 'Anak') + ' dari ' + ortu.map(x => x.Nama).join(' & '));
   const ps = pasDari(o);
   if (ps.length) b.push((o.JK === 'L' ? 'Suami' : o.JK === 'P' ? 'Istri' : 'Pasangan') + ' dari ' + ps.map(x => x.Nama).join(' & '));
+  if (!ortu.length) {
+    const sd = saudaraDari(o);
+    if (sd.length) b.push('Saudara kandung dari ' + sd.slice(0, 3).map(x => x.Nama).join(', '));
+  }
   const ak = anakDari(o);
   if (ak.length) b.push((o.JK === 'L' ? 'Ayah' : o.JK === 'P' ? 'Ibu' : 'Orang tua') + ' dari ' + ak.slice(0, 3).map(x => x.Nama).join(', ') + (ak.length > 3 ? ', dan lainnya' : ''));
   if (o.Konteks) b.push(o.Konteks);
