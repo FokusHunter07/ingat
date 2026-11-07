@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ingat · Kelola</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,600;7..72,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="config.js"></script>
+<style>
+:root{
+  --malam:#1B2440; --malam2:#232F55; --malam3:#2C3A66; --garis:#38467A;
+  --emas:#E0B04B; --lontar:#EAD9AE; --tinta:#2E1F0E; --giok:#5FB89A; --mawar:#E07A7A;
+  --teks:#EEF0F7; --redup:#A3ACCB;
+  --serif:'Literata',Georgia,serif; --sans:'Plus Jakarta Sans',system-ui,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--malam);color:var(--teks);font-family:var(--sans);font-size:16px;line-height:1.5}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--emas);outline-offset:2px}
+h1,h2{font-family:var(--serif);font-weight:700;margin:0;line-height:1.25}
+h1{font-size:22px} h2{font-size:20px}
+.redup{color:var(--redup)} .kecil{font-size:13px}
+[hidden]{display:none !important}
+
+header{position:sticky;top:0;z-index:10;background:rgba(27,36,64,.97);border-bottom:1px solid var(--garis)}
+.kepala{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 18px}
+.merek{display:flex;align-items:center;gap:10px}
+.merek .daun{width:34px;height:14px;border-radius:999px/7px;background:linear-gradient(180deg,#EFE0B8,#D6BF86);position:relative}
+.merek .daun::after{content:'';position:absolute;left:50%;top:50%;width:5px;height:5px;margin:-2.5px;border-radius:50%;background:var(--malam)}
+.tab{max-width:1200px;margin:0 auto;display:flex;gap:4px;padding:0 12px;overflow-x:auto}
+.tab button{padding:10px 14px;font-weight:600;color:var(--redup);border-bottom:2px solid transparent;white-space:nowrap}
+.tab button[aria-current="page"]{color:var(--emas);border-color:var(--emas)}
+
+main{max-width:1200px;margin:0 auto;padding:16px 18px 60px}
+.tata{display:grid;grid-template-columns:1fr;gap:20px}
+@media (min-width:900px){ .tata{grid-template-columns:380px 1fr;align-items:start} .kolom-daftar{position:sticky;top:110px;max-height:calc(100vh - 130px);overflow:auto} }
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;font-weight:700}
+.btn-emas{background:var(--emas);color:#2A1E05}
+.btn-garis{border:1px solid var(--garis);background:var(--malam2)}
+.btn-bahaya{color:var(--mawar);border:1px solid rgba(224,122,122,.5)}
+.btn-penuh{width:100%}
+.btn:disabled{opacity:.55;cursor:wait}
+
+input[type=text],input[type=search],input[type=password],textarea,select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--garis);background:var(--malam2);color:var(--teks);font:inherit}
+textarea{min-height:92px;resize:vertical}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--redup) 50%),linear-gradient(135deg,var(--redup) 50%,transparent 50%);
+  background-position:calc(100% - 20px) 52%,calc(100% - 14px) 52%;background-size:6px 6px;background-repeat:no-repeat;padding-right:36px}
+::placeholder{color:var(--redup)}
+label.lbl{display:block;font-weight:600;font-size:14px;margin:16px 0 6px}
+.petunjuk{font-size:13px;color:var(--redup);margin-top:5px}
+.wajib::after{content:' *';color:var(--emas)}
+
+.atas-daftar{display:flex;gap:10px;margin-bottom:12px}
+.atas-daftar .cari{flex:1}
+.saring{display:flex;gap:8px;margin-bottom:12px}
+.saring button,.seg button{padding:7px 14px;border-radius:999px;border:1px solid var(--garis);font-size:14px;font-weight:600}
+.saring button[aria-pressed="true"],.seg button[aria-pressed="true"]{background:var(--emas);border-color:var(--emas);color:#2A1E05}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+
+.daftar{display:flex;flex-direction:column}
+.item{display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:12px;text-align:left;width:100%}
+.item:hover{background:var(--malam2)}
+.item[aria-current="true"]{background:var(--malam3)}
+.item .tks{flex:1;min-width:0}
+.item .nm{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .sb{font-size:13px;color:var(--redup);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tanda{font-size:12px;font-weight:700;color:var(--emas);white-space:nowrap}
+.ava{width:44px;height:44px;flex-shrink:0;border-radius:50%;overflow:hidden;background:var(--malam3);display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-weight:700;color:var(--lontar);border:1px solid var(--garis)}
+.ava img{width:100%;height:100%;object-fit:cover}
+.kosong{padding:28px 8px;text-align:center;color:var(--redup)}
+
+.kolom-form{background:var(--malam2);border:1px solid var(--garis);border-radius:18px;padding:20px}
+@media (max-width:899px){
+  .kolom-form{position:fixed;inset:0;z-index:30;border-radius:0;border:0;overflow:auto;padding:16px 18px 40px;background:var(--malam)}
+  .kolom-form.tutup{display:none}
+}
+@media (min-width:900px){ .kolom-form.tutup{display:block} .tutup .isi-form{display:none} .tutup .sambut{display:block} }
+.sambut{display:none;text-align:center;padding:60px 20px;color:var(--redup)}
+.kepala-form{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.foto-pilih{display:flex;align-items:center;gap:16px;margin-top:8px}
+.foto-pilih .ava{width:96px;height:96px;font-size:34px;border:2px solid var(--garis)}
+.foto-pilih .aksi{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.grid2{display:grid;grid-template-columns:1fr;gap:0 16px}
+@media (min-width:640px){ .grid2{grid-template-columns:1fr 1fr} }
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.chips span{display:inline-flex;align-items:center;gap:6px;padding:5px 6px 5px 12px;border-radius:999px;background:var(--malam3);font-size:14px;font-weight:600}
+.chips button{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--redup)}
+.chips button:hover{background:var(--garis);color:var(--teks)}
+.aksi-bawah{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid var(--garis)}
+.aksi-bawah .kanan{margin-left:auto}
+.info-hub{margin-top:10px;font-size:14px;color:var(--emas);font-weight:600}
+
+.masuk{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.masuk form{width:100%;max-width:340px;text-align:center}
+.lontar{position:relative;background:repeating-linear-gradient(180deg,rgba(120,90,40,.10) 0 1px,transparent 1px 7px),linear-gradient(180deg,#EFE0B8,#EAD9AE 55%,#D6BF86);
+  color:var(--tinta);border-radius:999px/26px;padding:14px 50px;margin-bottom:22px;font-family:var(--serif);font-weight:700;font-size:22px}
+.lontar::before,.lontar::after{content:'';position:absolute;top:50%;width:11px;height:11px;margin-top:-5.5px;border-radius:50%;background:var(--malam)}
+.lontar::before{left:22px}.lontar::after{right:22px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);padding:11px 16px;border-radius:12px;font-weight:700;z-index:60;font-size:14px;max-width:92vw}
+.toast.ok{background:var(--giok);color:#06261b}.toast.no{background:var(--mawar);color:#2a0b0b}
+.memuat{opacity:.6;pointer-events:none}
+</style>
+</head>
+<body>
+<div id="masuk" class="masuk" hidden>
+  <form id="formMasuk">
+    <div class="lontar">Kelola ingatan</div>
+    <p class="redup">Masukkan PIN yang kamu tulis di Code.gs.</p>
+    <input type="password" id="pin" inputmode="text" autocomplete="current-password" placeholder="PIN" aria-label="PIN" required>
+    <div style="height:12px"></div>
+    <button class="btn btn-emas btn-penuh" id="tombolMasuk">Masuk</button>
+    <p class="redup kecil" id="pesanMasuk"></p>
+  </form>
+</div>
+
+<div id="utama" hidden>
+  <header>
+    <div class="kepala"><div class="merek"><span class="daun" aria-hidden="true"></span><h1>Kelola</h1></div><span class="redup kecil" id="ringkas"></span></div>
+    <div class="tab" id="tab">
+      <button data-tab="Orang" aria-current="page">Orang</button>
+      <button data-tab="Fakta">Fakta</button>
+      <button data-tab="Tips">Tips ngobrol</button>
+      <button data-tab="Skenario">Latihan situasi</button>
+      <button data-tab="Atur">Pengaturan</button>
+    </div>
+  </header>
+  <main id="isi"></main>
+</div>
+
+<input type="file" id="fileFoto" accept="image/*" hidden>
+
+<script>
+'use strict';
+const API_URL = window.INGAT_API;
+const SAPAAN = ['i','ni','pak','bu','bli','mbok','gede','putu','wayan','made','kadek','nengah','nyoman','komang','ketut','luh','ida','bagus','ayu','gusti','anak','agung','dewa','desak','jero'];
+const S = { orang: [], foto: {}, idx: {}, saya: '', Fakta: [], Tips: [], Skenario: [], tab: 'Orang', pilih: null, form: null, cari: '', filter: 'semua' };
+const $ = (s, el) => (el || document).querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+const ids = s => String(s || '').split(',').map(x => x.trim()).filter(Boolean);
+
+function monogram(o) {
+  const t = norm(o.Panggilan || o.Nama).split(' ').filter(Boolean);
+  const k = t.filter(x => SAPAAN.indexOf(x) < 0);
+  const p = k.length ? k : t;
+  return ((p[0] || '?')[0] + (p[1] ? p[1][0] : '')).toUpperCase();
+}
+function ava(o, foto) {
+  const f = foto !== undefined ? foto : S.foto[o.ID];
+  return '<span class="ava">' + (f ? '<img src="' + f + '" alt="">' : esc(monogram(o))) + '</span>';
+}
+function toast(msg, ok) {
+  const t = document.createElement('div');
+  t.className = 'toast ' + (ok ? 'ok' : 'no'); t.textContent = msg;
+  document.body.appendChild(t); setTimeout(() => t.remove(), 3000);
+}
+
+async function api(action, data) {
+  const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action, data: data || {}, pin: localStorage.getItem('ingat_pin') || '' }) });
+  const j = await res.json();
+  if (!j.ok) {
+    if (j.auth) { localStorage.removeItem('ingat_pin'); tampilMasuk(j.err); }
+    throw new Error(j.err || 'Gagal menghubungi server.');
+  }
+  return j;
+}
+
+// ---------- masuk ----------
+function tampilMasuk(pesan) {
+  $('#utama').hidden = true; $('#masuk').hidden = false;
+  $('#pesanMasuk').textContent = pesan || '';
+  setTimeout(() => $('#pin').focus(), 50);
+}
+$('#formMasuk').addEventListener('submit', async e => {
+  e.preventDefault();
+  localStorage.setItem('ingat_pin', $('#pin').value.trim());
+  $('#tombolMasuk').disabled = true; $('#pesanMasuk').textContent = 'Memeriksa…';
+  try { await muatSemua(); } catch (err) { /* pesan sudah tampil */ }
+  $('#tombolMasuk').disabled = false;
+});
+
+async function muatSemua() {
+  const j = await api('k_boot');
+  S.foto = {};
+  j.orang.forEach(o => { if (o.Foto) S.foto[o.ID] = o.Foto; delete o.Foto; });
+  setOrang(j.orang, j.saya);
+  S.Fakta = j.fakta; S.Tips = j.tips; S.Skenario = j.skenario;
+  $('#masuk').hidden = true; $('#utama').hidden = false;
+  const m = location.hash.match(/^#orang-(\d+)$/);
+  if (m && S.idx[m[1]]) { S.tab = 'Orang'; S.pilih = m[1]; S.form = salin(S.idx[m[1]]); }
+  render();
+}
+
+function setOrang(list, saya) {
+  S.orang = list; S.saya = saya || '';
+  S.idx = {}; list.forEach(o => S.idx[o.ID] = o);
+  $('#ringkas').textContent = list.length + ' orang tersimpan';
+}
+
+function salin(o) { const x = Object.assign({}, o); x.Foto = S.foto[o.ID] || ''; return x; }
+
+$('#tab').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (!bolehPindah()) return;
+  S.tab = b.dataset.tab; S.pilih = null; S.form = null; S.cari = '';
+  document.querySelectorAll('#tab button').forEach(x => x.removeAttribute('aria-current'));
+  b.setAttribute('aria-current', 'page');
+  history.replaceState(null, '', location.pathname);
+  render();
+});
+
+function bolehPindah() {
+  return !S.kotor || confirm('Perubahan belum disimpan. Tetap pindah?');
+}
+
+function render() {
+  S.kotor = false;
+  if (S.tab === 'Orang') return renderOrang();
+  if (S.tab === 'Atur') return renderAtur();
+  return renderUmum(S.tab);
+}
+
+// ---------- ORANG ----------
+function urutNama(a, b) { return a.Nama.localeCompare(b.Nama); }
+
+function renderOrang() {
+  const isi = $('#isi');
+  isi.innerHTML = '<div class="tata"><section class="kolom-daftar"><div class="atas-daftar"><input class="cari" type="search" id="cari" placeholder="Cari nama" aria-label="Cari orang" value="' + esc(S.cari) + '">' +
+    '<button class="btn btn-emas" id="tambah">Tambah</button></div><div class="saring" id="saring">' +
+    [['semua', 'Semua'], ['keluarga', 'Keluarga'], ['kenalan', 'Kenalan']].map(f => '<button data-f="' + f[0] + '" aria-pressed="' + (S.filter === f[0]) + '">' + f[1] + '</button>').join('') +
+    '</div><div class="daftar" id="daftar"></div></section><section class="kolom-form" id="kolomForm"></section></div>';
+  isiDaftarOrang();
+  $('#cari').addEventListener('input', e => { S.cari = e.target.value; isiDaftarOrang(); });
+  $('#saring').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.filter = b.dataset.f; $('#saring').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); isiDaftarOrang(); });
+  $('#tambah').addEventListener('click', () => { if (bolehPindah()) bukaForm(null); });
+  renderFormOrang();
+}
+
+function isiDaftarOrang() {
+  const q = norm(S.cari);
+  let list = S.orang.slice().sort(urutNama);
+  if (S.filter !== 'semua') list = list.filter(o => o.Jenis === S.filter);
+  if (q) list = list.filter(o => norm(o.Nama + ' ' + o.Panggilan + ' ' + o.Konteks).indexOf(q) >= 0);
+  const el = $('#daftar');
+  if (!list.length) {
+    el.innerHTML = '<div class="kosong">' + (S.orang.length ? 'Tidak ada yang cocok.' : 'Belum ada orang. Mulai dengan menambahkan dirimu sendiri, lalu orang tuamu.') + '</div>';
+    return;
+  }
+  el.innerHTML = list.map(o => {
+    const sub = o.ID === S.saya ? 'Ini kamu' : (o.hub || (o.Jenis === 'kenalan' ? (o.Konteks || 'Kenalan') : 'Belum terhubung'));
+    return '<button class="item" data-id="' + o.ID + '" aria-current="' + (S.pilih === o.ID) + '">' + ava(o) + '<span class="tks"><span class="nm" style="display:block">' + esc(o.Nama) +
+      '</span><span class="sb" style="display:block">' + esc(sub) + '</span></span>' + (!S.foto[o.ID] ? '<span class="tanda">tanpa foto</span>' : '') + '</button>';
+  }).join('');
+  el.querySelectorAll('.item').forEach(b => b.addEventListener('click', () => { if (bolehPindah()) bukaForm(b.dataset.id); }));
+}
+
+function bukaForm(id, awal) {
+  S.kotor = false;
+  S.pilih = id;
+  S.form = id ? salin(S.idx[id]) : Object.assign({ ID: '', Jenis: 'keluarga', Nama: '', Panggilan: '', JK: '', Ayah: '', Ibu: '', Pasangan: '', Konteks: '', Jembatan: '', Catatan: '', Foto: '' }, awal || {});
+  history.replaceState(null, '', id ? '#orang-' + id : location.pathname);
+  isiDaftarOrang();
+  renderFormOrang();
+  if (innerWidth < 900) $('#kolomForm').scrollTop = 0;
+}
+
+function tutupForm() {
+  if (!bolehPindah()) return;
+  S.pilih = null; S.form = null; S.kotor = false;
+  history.replaceState(null, '', location.pathname);
+  isiDaftarOrang(); renderFormOrang();
+}
+
+function turunan(id) {
+  const hasil = [], antre = [id];
+  while (antre.length) {
+    const cur = antre.shift();
+    S.orang.forEach(c => { if ((c.Ayah === cur || c.Ibu === cur) && hasil.indexOf(c.ID) < 0) { hasil.push(c.ID); antre.push(c.ID); } });
+  }
+  return hasil;
+}
+
+function renderFormOrang() {
+  const kol = $('#kolomForm');
+  const f = S.form;
+  if (!f) {
+    kol.className = 'kolom-form tutup';
+    kol.innerHTML = '<div class="sambut"><p>Pilih orang di daftar untuk mengubahnya,<br>atau tekan Tambah.</p></div>';
+    return;
+  }
+  kol.className = 'kolom-form';
+  const id = f.ID;
+  const larang = id ? [id].concat(turunan(id)) : [];
+  const keluarga = S.orang.filter(o => o.Jenis !== 'kenalan' && larang.indexOf(o.ID) < 0).sort(urutNama);
+  const opsiOrtu = (jk, pilihan) => '<option value="">Belum tahu / kosong</option>' + keluarga.filter(o => !o.JK || o.JK === jk || o.ID === pilihan)
+    .map(o => '<option value="' + o.ID + '"' + (o.ID === pilihan ? ' selected' : '') + '>' + esc(o.Nama) + (o.Panggilan ? ' (' + esc(o.Panggilan) + ')' : '') + '</option>').join('');
+  const pas = ids(f.Pasangan).filter(p => S.idx[p]);
+  const opsiPas = '<option value="">+ Tambah pasangan…</option>' + keluarga.filter(o => o.ID !== id && pas.indexOf(o.ID) < 0)
+    .map(o => '<option value="' + o.ID + '">' + esc(o.Nama) + '</option>').join('');
+  const kel = f.Jenis !== 'kenalan';
+
+  let h = '<div class="isi-form"><div class="kepala-form"><h2>' + (id ? 'Ubah data' : 'Orang baru') + '</h2><button class="btn btn-garis" id="batal">Tutup</button></div>';
+  if (id && S.idx[id].hub) h += '<div class="info-hub">' + esc(S.idx[id].hub) + ' bagimu</div>';
+  if (id && id === S.saya) h += '<div class="info-hub">Ini kamu</div>';
+
+  h += '<label class="lbl">Foto</label><div class="foto-pilih">' + ava(f, f.Foto) + '<div class="aksi"><button class="btn btn-garis" id="pilihFoto">' + (f.Foto ? 'Ganti foto' : 'Pilih foto') + '</button>' +
+    (f.Foto ? '<button class="redup kecil" id="hapusFoto">Hapus foto</button>' : '<span class="petunjuk">Boleh dikosongkan. Foto wajah yang jelas paling membantu.</span>') + '</div></div>';
+
+  h += '<label class="lbl">Jenis</label><div class="seg" id="segJenis">' + [['keluarga', 'Keluarga'], ['kenalan', 'Kenalan / rekan']].map(x =>
+    '<button type="button" data-v="' + x[0] + '" aria-pressed="' + (f.Jenis === x[0]) + '">' + x[1] + '</button>').join('') + '</div>';
+
+  h += '<div class="grid2"><div><label class="lbl wajib" for="fNama">Nama lengkap</label><input type="text" id="fNama" value="' + esc(f.Nama) + '" placeholder="Contoh: I Made Darma"></div>' +
+    '<div><label class="lbl" for="fPanggilan">Nama panggilan</label><input type="text" id="fPanggilan" value="' + esc(f.Panggilan) + '" placeholder="Contoh: Pak De Darma"></div></div>';
+
+  h += '<label class="lbl">Jenis kelamin</label><div class="seg" id="segJK">' + [['L', 'Laki-laki'], ['P', 'Perempuan'], ['', 'Belum diisi']].map(x =>
+    '<button type="button" data-v="' + x[0] + '" aria-pressed="' + (f.JK === x[0]) + '">' + x[1] + '</button>').join('') + '</div>';
+
+  if (kel) {
+    h += '<div class="grid2"><div><label class="lbl" for="fAyah">Ayah</label><select id="fAyah">' + opsiOrtu('L', f.Ayah) + '</select></div>' +
+      '<div><label class="lbl" for="fIbu">Ibu</label><select id="fIbu">' + opsiOrtu('P', f.Ibu) + '</select></div></div>' +
+      '<p class="petunjuk">Orang tuanya belum ada di daftar? Simpan orang ini dulu, lalu tambahkan orang tuanya.</p>';
+    h += '<label class="lbl" for="fPas">Pasangan (suami/istri)</label><div class="chips" id="chipsPas">' +
+      pas.map(p => '<span>' + esc(S.idx[p].Nama) + '<button type="button" data-hapus="' + p + '" aria-label="Lepas pasangan">✕</button></span>').join('') + '</div>' +
+      '<select id="fPas">' + opsiPas + '</select>';
+  }
+
+  h += '<label class="lbl" for="fKonteks">' + (kel ? 'Keterangan' : 'Kenal di mana / siapa dia') + '</label><input type="text" id="fKonteks" value="' + esc(f.Konteks) + '" placeholder="' +
+    (kel ? 'Contoh: tinggal di Abang, petani jeruk' : 'Contoh: petugas DLH, ketemu rapat PKS') + '">';
+  h += '<label class="lbl" for="fJembatan">Jembatan ingatan</label><input type="text" id="fJembatan" value="' + esc(f.Jembatan) + '" placeholder="Contoh: Darma = jubah hakim, orangnya adil">' +
+    '<p class="petunjuk">Kaitkan namanya dengan gambar lucu atau aneh. Makin konyol, makin nempel.</p>';
+  h += '<label class="lbl" for="fCatatan">Catatan obrolan</label><textarea id="fCatatan" placeholder="Satu baris satu catatan. Contoh: 07/11/26: mau mancing ke Amed">' + esc(f.Catatan) + '</textarea>' +
+    '<button type="button" class="redup kecil" id="tglCatatan" style="margin-top:6px">+ Baris baru dengan tanggal hari ini</button>';
+
+  h += '<div class="aksi-bawah"><button class="btn btn-emas" id="simpan">Simpan</button>';
+  if (id && kel) h += '<button class="btn btn-garis" id="tambahAnak">Tambah anak</button>';
+  if (id && kel && id !== S.saya) h += '<button class="btn btn-garis" id="jadiSaya">Ini aku</button>';
+  if (id) h += '<button class="btn btn-bahaya kanan" id="hapus">Hapus</button>';
+  h += '</div></div>';
+  kol.innerHTML = h;
+
+  const tandai = () => { S.kotor = true; };
+  const ambil = () => {
+    f.Nama = $('#fNama').value; f.Panggilan = $('#fPanggilan').value; f.Konteks = $('#fKonteks').value;
+    f.Jembatan = $('#fJembatan').value; f.Catatan = $('#fCatatan').value;
+    if ($('#fAyah')) { f.Ayah = $('#fAyah').value; f.Ibu = $('#fIbu').value; }
+  };
+  kol.querySelectorAll('input,textarea,select').forEach(el => el.addEventListener('input', tandai));
+  $('#batal').addEventListener('click', tutupForm);
+  $('#fNama').addEventListener('change', () => {
+    if (f.JK) return;
+    const n = norm($('#fNama').value);
+    const jk = /^ni /.test(n) || /\b(ayu|desak)\b/.test(n) ? 'P' : /^i /.test(n) || /\bbagus\b/.test(n) ? 'L' : '';
+    if (jk) { ambil(); f.JK = jk; renderFormOrang(); S.kotor = true; }
+  });
+  $('#segJenis').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; ambil(); f.Jenis = b.dataset.v; S.kotor = true; renderFormOrang(); S.kotor = true; });
+  $('#segJK').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; ambil(); f.JK = b.dataset.v; renderFormOrang(); S.kotor = true; });
+  $('#pilihFoto').addEventListener('click', () => { ambil(); $('#fileFoto').value = ''; $('#fileFoto').click(); });
+  if ($('#hapusFoto')) $('#hapusFoto').addEventListener('click', () => { ambil(); f.Foto = ''; renderFormOrang(); S.kotor = true; });
+  if ($('#fPas')) {
+    $('#fPas').addEventListener('change', e => { if (!e.target.value) return; ambil(); f.Pasangan = pas.concat([e.target.value]).join(','); renderFormOrang(); S.kotor = true; });
+    $('#chipsPas').addEventListener('click', e => { const b = e.target.closest('[data-hapus]'); if (!b) return; ambil(); f.Pasangan = pas.filter(p => p !== b.dataset.hapus).join(','); renderFormOrang(); S.kotor = true; });
+  }
+  $('#tglCatatan').addEventListener('click', () => {
+    const t = $('#fCatatan'); const d = new Date();
+    const tgl = String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getFullYear()).slice(2);
+    t.value = (t.value.trim() ? t.value.replace(/\s+$/, '') + '\n' : '') + tgl + ': ';
+    t.focus(); t.setSelectionRange(t.value.length, t.value.length); S.kotor = true;
+  });
+  $('#simpan').addEventListener('click', () => { ambil(); simpanOrang(); });
+  if ($('#hapus')) $('#hapus').addEventListener('click', hapusOrang);
+  if ($('#tambahAnak')) $('#tambahAnak').addEventListener('click', () => {
+    if (!bolehPindah()) return;
+    const o = S.idx[id]; const awal = { Jenis: 'keluarga' };
+    const ps = ids(o.Pasangan).map(p => S.idx[p]).filter(Boolean);
+    if (o.JK === 'L') { awal.Ayah = o.ID; if (ps.length === 1 && ps[0].JK !== 'L') awal.Ibu = ps[0].ID; }
+    else if (o.JK === 'P') { awal.Ibu = o.ID; if (ps.length === 1 && ps[0].JK !== 'P') awal.Ayah = ps[0].ID; }
+    else return toast('Isi dulu jenis kelamin ' + o.Nama + '.');
+    S.kotor = false; bukaForm(null, awal);
+  });
+  if ($('#jadiSaya')) $('#jadiSaya').addEventListener('click', () => aturSaya(id));
+}
+
+$('#fileFoto').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file || !S.form) return;
+  try {
+    S.form.Foto = await prosesFoto(file);
+    S.kotor = true;
+    renderFormOrang(); S.kotor = true;
+  } catch (err) { toast('Foto tidak bisa dibaca. Coba foto lain.'); }
+});
+
+// foto dipotong persegi dan diperkecil supaya muat di Google Sheet
+function prosesFoto(file) {
+  return new Promise((ok, gagal) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const s = Math.min(img.naturalWidth, img.naturalHeight);
+      const sx = (img.naturalWidth - s) / 2;
+      const sy = (img.naturalHeight - s) * 0.3;
+      let ukuran = 320, hasil = '';
+      while (ukuran >= 160) {
+        const c = document.createElement('canvas');
+        c.width = c.height = ukuran;
+        c.getContext('2d').drawImage(img, sx, sy, s, s, 0, 0, ukuran, ukuran);
+        for (let q = 0.85; q >= 0.45; q -= 0.1) {
+          hasil = c.toDataURL('image/jpeg', q);
+          if (hasil.length < 45000) return ok(hasil);
+        }
+        ukuran -= 60;
+      }
+      ok(hasil);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); gagal(new Error('gambar rusak')); };
+    img.src = url;
+  });
+}
+
+async function simpanOrang() {
+  const f = S.form;
+  if (!f.Nama.trim()) return toast('Nama wajib diisi.');
+  const tombol = $('#simpan'); tombol.disabled = true; tombol.textContent = 'Menyimpan…';
+  try {
+    const j = await api('k_simpanOrang', { item: f });
+    S.foto[j.id] = f.Foto || '';
+    if (!f.Foto) delete S.foto[j.id];
+    setOrang(j.orang, j.saya);
+    S.kotor = false;
+    toast(f.ID ? 'Perubahan disimpan.' : f.Nama + ' ditambahkan.', true);
+    bukaForm(j.id);
+  } catch (err) {
+    toast(err.message);
+    tombol.disabled = false; tombol.textContent = 'Simpan';
+  }
+}
+
+async function hapusOrang() {
+  const o = S.idx[S.form.ID];
+  if (!confirm('Hapus ' + o.Nama + '? Tautan ke orang tua, pasangan, dan anaknya ikut dilepas.')) return;
+  try {
+    const j = await api('k_hapusOrang', { id: o.ID });
+    delete S.foto[o.ID];
+    setOrang(j.orang, j.saya);
+    S.kotor = false; S.form = null; S.pilih = null;
+    history.replaceState(null, '', location.pathname);
+    toast(o.Nama + ' dihapus.', true);
+    renderOrang();
+  } catch (err) { toast(err.message); }
+}
+
+async function aturSaya(id) {
+  try {
+    const j = await api('k_saya', { id: id });
+    setOrang(j.orang, j.saya);
+    toast(id ? 'Sekarang hubungan keluarga dihitung dari ' + S.idx[id].Nama + '.' : 'Tanda "aku" dilepas.', true);
+    render();
+    if (S.tab === 'Orang' && id) bukaForm(id);
+  } catch (err) { toast(err.message); }
+}
+
+// ---------- FAKTA, TIPS, SKENARIO ----------
+const BENTUK = {
+  Fakta: {
+    baru: 'Fakta baru', kosong: 'Belum ada fakta. Tambahkan hal baru yang kamu pelajari hari ini.',
+    judul: x => x.Pertanyaan, sub: x => (x.Kategori ? x.Kategori + ': ' : '') + x.Jawaban,
+    field: [
+      { k: 'Kategori', l: 'Kategori', t: 'daftar', p: 'Contoh: Geografi', h: 'Fakta dengan kategori sama dipakai sebagai pilihan jawaban satu sama lain. Minimal 4 fakta per kategori supaya jadi pilihan ganda.' },
+      { k: 'Pertanyaan', l: 'Pertanyaan', t: 'area', w: 1, p: 'Contoh: Gunung tertinggi di Bali?' },
+      { k: 'Jawaban', l: 'Jawaban', t: 'text', w: 1, p: 'Contoh: Gunung Agung' },
+      { k: 'Penjelasan', l: 'Penjelasan singkat', t: 'area', h: 'Muncul setelah kamu menjawab.' }
+    ]
+  },
+  Tips: {
+    baru: 'Tips baru', kosong: 'Belum ada tips.',
+    judul: x => x.Judul || x.Isi, sub: x => x.Kategori,
+    field: [
+      { k: 'Kategori', l: 'Kategori', t: 'daftar', p: 'Contoh: Pembuka' },
+      { k: 'Judul', l: 'Judul', t: 'text', p: 'Contoh: Sebut namamu duluan' },
+      { k: 'Isi', l: 'Isi', t: 'area', w: 1 }
+    ]
+  },
+  Skenario: {
+    baru: 'Situasi baru', kosong: 'Belum ada latihan situasi.',
+    judul: x => x.Situasi, sub: x => 'Jawaban terbaik: ' + x.Kunci,
+    field: [
+      { k: 'Situasi', l: 'Situasinya', t: 'area', w: 1, p: 'Contoh: Kamu bertemu tetangga baru di warung.' },
+      { k: 'PilihanA', l: 'Pilihan A', t: 'area', w: 1 },
+      { k: 'PilihanB', l: 'Pilihan B', t: 'area', w: 1 },
+      { k: 'PilihanC', l: 'Pilihan C', t: 'area', w: 1 },
+      { k: 'Kunci', l: 'Pilihan terbaik', t: 'pilih', w: 1, o: ['A', 'B', 'C'] },
+      { k: 'Penjelasan', l: 'Kenapa itu yang terbaik', t: 'area' }
+    ]
+  }
+};
+
+function renderUmum(n) {
+  const B = BENTUK[n];
+  $('#isi').innerHTML = '<div class="tata"><section class="kolom-daftar"><div class="atas-daftar"><input class="cari" type="search" id="cari" placeholder="Cari" aria-label="Cari" value="' + esc(S.cari) + '">' +
+    '<button class="btn btn-emas" id="tambah">Tambah</button></div><div class="daftar" id="daftar"></div></section><section class="kolom-form" id="kolomForm"></section></div>';
+  const isiDaftar = () => {
+    const q = norm(S.cari);
+    const list = S[n].filter(x => !q || norm(Object.values(x).join(' ')).indexOf(q) >= 0);
+    $('#daftar').innerHTML = list.length ? list.map(x => '<button class="item" data-id="' + x.ID + '" aria-current="' + (S.pilih === x.ID) + '"><span class="tks"><span class="nm" style="display:block">' +
+      esc(B.judul(x)) + '</span><span class="sb" style="display:block">' + esc(B.sub(x)) + '</span></span></button>').join('') : '<div class="kosong">' + (S[n].length ? 'Tidak ada yang cocok.' : B.kosong) + '</div>';
+    $('#daftar').querySelectorAll('.item').forEach(b => b.addEventListener('click', () => { if (bolehPindah()) { S.pilih = b.dataset.id; S.form = Object.assign({}, S[n].filter(x => x.ID === b.dataset.id)[0]); isiDaftar(); formUmum(n, isiDaftar); } }));
+  };
+  $('#cari').addEventListener('input', e => { S.cari = e.target.value; isiDaftar(); });
+  $('#tambah').addEventListener('click', () => { if (!bolehPindah()) return; S.pilih = null; S.form = { ID: '' }; isiDaftar(); formUmum(n, isiDaftar); });
+  isiDaftar();
+  formUmum(n, isiDaftar);
+}
+
+function formUmum(n, isiDaftar) {
+  const B = BENTUK[n], f = S.form, kol = $('#kolomForm');
+  S.kotor = false;
+  if (!f) { kol.className = 'kolom-form tutup'; kol.innerHTML = '<div class="sambut"><p>Pilih di daftar untuk mengubah, atau tekan Tambah.</p></div>'; return; }
+  kol.className = 'kolom-form';
+  const kategori = Array.from(new Set(S[n].map(x => x.Kategori).filter(Boolean))).sort();
+  let h = '<div class="isi-form"><div class="kepala-form"><h2>' + (f.ID ? 'Ubah' : B.baru) + '</h2><button class="btn btn-garis" id="batal">Tutup</button></div>';
+  B.field.forEach(fd => {
+    const v = f[fd.k] || '';
+    h += '<label class="lbl' + (fd.w ? ' wajib' : '') + '" for="u' + fd.k + '">' + fd.l + '</label>';
+    if (fd.t === 'area') h += '<textarea id="u' + fd.k + '" placeholder="' + esc(fd.p || '') + '">' + esc(v) + '</textarea>';
+    else if (fd.t === 'pilih') h += '<select id="u' + fd.k + '"><option value="">Pilih…</option>' + fd.o.map(o => '<option' + (o === v ? ' selected' : '') + '>' + o + '</option>').join('') + '</select>';
+    else h += '<input type="text" id="u' + fd.k + '" value="' + esc(v) + '" placeholder="' + esc(fd.p || '') + '"' + (fd.t === 'daftar' ? ' list="dl' + fd.k + '"' : '') + '>' +
+      (fd.t === 'daftar' ? '<datalist id="dl' + fd.k + '">' + kategori.map(k => '<option value="' + esc(k) + '">').join('') + '</datalist>' : '');
+    if (fd.h) h += '<p class="petunjuk">' + esc(fd.h) + '</p>';
+  });
+  h += '<div class="aksi-bawah"><button class="btn btn-emas" id="simpan">Simpan</button>' + (f.ID ? '<button class="btn btn-bahaya kanan" id="hapus">Hapus</button>' : '') + '</div></div>';
+  kol.innerHTML = h;
+  kol.querySelectorAll('input,textarea,select').forEach(el => el.addEventListener('input', () => { S.kotor = true; }));
+  $('#batal').addEventListener('click', () => { if (!bolehPindah()) return; S.form = null; S.pilih = null; isiDaftar(); formUmum(n, isiDaftar); });
+  $('#simpan').addEventListener('click', async () => {
+    const item = { ID: f.ID };
+    for (const fd of B.field) {
+      item[fd.k] = $('#u' + fd.k).value.trim();
+      if (fd.w && !item[fd.k]) return toast(fd.l + ' wajib diisi.');
+    }
+    const t = $('#simpan'); t.disabled = true; t.textContent = 'Menyimpan…';
+    try {
+      const j = await api('k_simpan', { sheet: n, item: item });
+      S[n] = j.items; S.kotor = false;
+      S.pilih = j.id; S.form = Object.assign({}, S[n].filter(x => x.ID === j.id)[0]);
+      toast('Tersimpan.', true);
+      isiDaftar(); formUmum(n, isiDaftar);
+    } catch (err) { toast(err.message); t.disabled = false; t.textContent = 'Simpan'; }
+  });
+  if ($('#hapus')) $('#hapus').addEventListener('click', async () => {
+    if (!confirm('Hapus data ini?')) return;
+    try {
+      const j = await api('k_hapus', { sheet: n, id: f.ID });
+      S[n] = j.items; S.form = null; S.pilih = null; S.kotor = false;
+      toast('Dihapus.', true);
+      isiDaftar(); formUmum(n, isiDaftar);
+    } catch (err) { toast(err.message); }
+  });
+}
+
+// ---------- PENGATURAN ----------
+function renderAtur() {
+  const keluarga = S.orang.filter(o => o.Jenis !== 'kenalan').sort(urutNama);
+  const k = S.orang.filter(o => o.Jenis === 'kenalan').length;
+  $('#isi').innerHTML = '<div style="max-width:560px"><div class="kolom-form"><h2>Siapa kamu di silsilah?</h2>' +
+    '<p class="redup">Semua sebutan seperti paman, sepupu, atau mertua dihitung dari orang yang kamu pilih di sini.</p>' +
+    '<select id="pilihSaya"><option value="">Belum dipilih</option>' + keluarga.map(o => '<option value="' + o.ID + '"' + (o.ID === S.saya ? ' selected' : '') + '>' + esc(o.Nama) + '</option>').join('') + '</select>' +
+    '<div style="height:12px"></div><button class="btn btn-emas" id="simpanSaya">Simpan</button></div><div style="height:18px"></div>' +
+    '<div class="kolom-form"><h2>Ringkasan</h2><p style="margin:8px 0 0">' + keluarga.length + ' keluarga, ' + k + ' kenalan, ' + S.Fakta.length + ' fakta, ' + S.Tips.length + ' tips, ' + S.Skenario.length + ' latihan situasi.</p>' +
+    '<p class="redup kecil">' + Object.keys(S.foto).length + ' orang sudah punya foto.</p></div><div style="height:18px"></div>' +
+    '<div class="kolom-form"><h2>Perangkat ini</h2><p class="redup">PIN tersimpan di browser ini supaya kamu tidak perlu mengetik ulang.</p><button class="btn btn-garis" id="keluar">Keluar dan hapus PIN dari perangkat ini</button></div></div>';
+  $('#simpanSaya').addEventListener('click', () => aturSaya($('#pilihSaya').value));
+  $('#keluar').addEventListener('click', () => { localStorage.removeItem('ingat_pin'); location.reload(); });
+}
+
+window.addEventListener('beforeunload', e => { if (S.kotor) { e.preventDefault(); e.returnValue = ''; } });
+
+// ---------- mulai ----------
+(async function () {
+  if (!API_URL || API_URL.indexOf('ISI_') === 0) {
+    tampilMasuk('Alamat server belum diisi. Buka file config.js di GitHub dan isi alamat Apps Script-mu.');
+    $('#tombolMasuk').disabled = true; return;
+  }
+  if (!localStorage.getItem('ingat_pin')) return tampilMasuk();
+  document.body.classList.add('memuat');
+  try { await muatSemua(); } catch (e) { if (!$('#utama').hidden) toast(e.message); else tampilMasuk(e.message); }
+  document.body.classList.remove('memuat');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ingat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="config.js"></script>
+<style>
+:root{
+  --malam:#1B2440; --malam2:#232F55; --malam3:#2C3A66; --garis:#38467A;
+  --emas:#E0B04B; --emas-redup:#8C6E2E; --lontar:#EAD9AE; --lontar-gelap:#D6BF86; --tinta:#2E1F0E;
+  --giok:#5FB89A; --mawar:#E07A7A; --teks:#EEF0F7; --redup:#A3ACCB;
+  --serif:'Literata',Georgia,serif; --sans:'Plus Jakarta Sans',system-ui,sans-serif;
+  --nav:64px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--malam);color:var(--teks);font-family:var(--sans);font-size:16px;line-height:1.5}
+body{min-height:100vh;padding-bottom:calc(var(--nav) + env(safe-area-inset-bottom))}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--emas);outline-offset:2px}
+img{display:block}
+.wrap{max-width:560px;margin:0 auto;padding:16px 18px 24px}
+h1,h2,h3{font-family:var(--serif);font-weight:600;margin:0;line-height:1.25}
+h2{font-size:22px} h3{font-size:18px}
+.redup{color:var(--redup)}
+.kecil{font-size:13px}
+
+/* kepala */
+.kepala{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.kepala h1{font-size:24px}
+.api{display:flex;align-items:center;gap:6px;background:var(--malam2);border:1px solid var(--garis);border-radius:999px;padding:6px 12px 6px 10px;font-weight:700}
+.api svg{width:18px;height:18px}
+.api.padam{color:var(--redup)}
+
+/* navigasi bawah */
+nav{position:fixed;left:0;right:0;bottom:0;height:calc(var(--nav) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);
+  background:rgba(27,36,64,.96);backdrop-filter:blur(8px);border-top:1px solid var(--garis);display:flex;z-index:20}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;font-weight:600;color:var(--redup)}
+nav button svg{width:22px;height:22px}
+nav button[aria-current="page"]{color:var(--emas)}
+
+/* tombol */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px 18px;border-radius:14px;font-weight:700;font-size:16px}
+.btn-emas{background:var(--emas);color:#2A1E05}
+.btn-emas:active{transform:scale(.98)}
+.btn-garis{border:1px solid var(--garis);background:var(--malam2)}
+.baris-btn{display:flex;gap:10px}
+.baris-btn .btn{flex:1}
+
+/* panel */
+.panel{background:var(--malam2);border:1px solid var(--garis);border-radius:18px;padding:18px}
+.jarak{height:16px}
+
+/* minggu */
+.minggu{display:flex;gap:8px;align-items:flex-end;height:84px;margin-top:14px}
+.minggu .hari{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.minggu .batang{width:100%;max-width:26px;border-radius:6px;background:var(--malam3);min-height:6px;position:relative;overflow:hidden}
+.minggu .batang i{position:absolute;left:0;right:0;bottom:0;background:var(--emas);border-radius:6px}
+.minggu .hari span{font-size:11px;color:var(--redup)}
+.minggu .hari.kini span{color:var(--emas);font-weight:700}
+
+/* LONTAR: kartu latihan — elemen paling khas */
+.lontar{position:relative;background:
+   repeating-linear-gradient(180deg,rgba(120,90,40,.10) 0 1px,transparent 1px 7px),
+   linear-gradient(180deg,#EFE0B8,var(--lontar) 55%,var(--lontar-gelap));
+  color:var(--tinta);border-radius:999px/28px;padding:16px 56px;min-height:72px;display:flex;align-items:center;justify-content:center;text-align:center;
+  box-shadow:inset 0 -3px 0 rgba(90,60,20,.18),0 10px 30px rgba(0,0,0,.35)}
+.lontar::before,.lontar::after{content:'';position:absolute;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;
+  background:var(--malam);box-shadow:inset 0 1px 2px rgba(0,0,0,.6)}
+.lontar::before{left:24px}.lontar::after{right:24px}
+.lontar .tulisan{font-family:var(--serif);font-weight:700;font-size:22px;line-height:1.25;letter-spacing:.01em}
+.lontar .tulisan.kosong{letter-spacing:.4em;opacity:.35}
+.lontar.besar .tulisan{font-size:28px}
+.lontar .huruf{display:inline-block;opacity:0;transform:translateY(4px);filter:blur(3px);animation:tinta .38s ease forwards}
+@keyframes tinta{to{opacity:1;transform:none;filter:none}}
+
+/* sesi latihan */
+.progres{height:6px;background:var(--malam3);border-radius:6px;overflow:hidden;margin:4px 0 18px}
+.progres i{display:block;height:100%;background:var(--emas);transition:width .4s ease}
+.kepala-sesi{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.bingkai{position:relative;width:min(72vw,280px);aspect-ratio:1;margin:6px auto -26px;border-radius:24px;overflow:hidden;
+  border:3px solid var(--emas-redup);background:var(--malam3);z-index:1}
+.bingkai img{width:100%;height:100%;object-fit:cover}
+.tanya{background:var(--malam2);border:1px solid var(--garis);border-radius:20px;padding:22px 20px 40px;margin-bottom:-26px;position:relative;z-index:1;text-align:center}
+.tanya .label{font-size:13px;color:var(--emas);font-weight:600;margin-bottom:8px}
+.tanya .isi{font-family:var(--serif);font-size:20px;line-height:1.4}
+.kartu-sesi .lontar{position:relative;z-index:2;margin:0 4px}
+.pilihan{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.pilihan button{text-align:left;padding:14px 16px;border-radius:14px;background:var(--malam2);border:1px solid var(--garis);font-weight:600;transition:background .2s,border-color .2s}
+.pilihan button:active{transform:scale(.99)}
+.pilihan button.benar{background:rgba(95,184,154,.18);border-color:var(--giok)}
+.pilihan button.salah{background:rgba(224,122,122,.16);border-color:var(--mawar)}
+.pilihan button[disabled]{cursor:default}
+.pilihan .btn{text-align:center;justify-content:center}
+.pilihan .btn-emas{background:var(--emas);color:#2A1E05;border-color:var(--emas)}
+.hasil{margin-top:16px;padding:16px;border-radius:16px;background:var(--malam2);border:1px solid var(--garis)}
+.hasil .vonis{font-weight:700;margin-bottom:6px}
+.vonis.ok{color:var(--giok)} .vonis.no{color:var(--mawar)}
+.info-baris{display:flex;gap:10px;margin-top:8px;font-size:15px}
+.info-baris b{color:var(--redup);font-weight:600;min-width:84px;flex-shrink:0}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(224,176,75,.14);color:var(--emas);font-size:13px;font-weight:700}
+
+/* galeri orang */
+.cari{width:100%;padding:13px 16px;border-radius:14px;border:1px solid var(--garis);background:var(--malam2);color:var(--teks);font:inherit}
+.cari::placeholder{color:var(--redup)}
+.saring{display:flex;gap:8px;margin:12px 0 16px;overflow-x:auto}
+.saring button{padding:8px 14px;border-radius:999px;border:1px solid var(--garis);font-size:14px;font-weight:600;white-space:nowrap}
+.saring button[aria-pressed="true"]{background:var(--emas);color:#2A1E05;border-color:var(--emas)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 12px}
+.orang{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.ava{width:100%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:var(--malam3);display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-weight:700;font-size:26px;color:var(--lontar);border:2px solid var(--garis)}
+.ava img{width:100%;height:100%;object-fit:cover}
+.orang .nm{font-size:13px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.orang .hb{font-size:12px;color:var(--emas);margin-top:-4px}
+
+/* lembar detail */
+.tirai{position:fixed;inset:0;background:rgba(10,14,28,.6);z-index:40;opacity:0;pointer-events:none;transition:opacity .25s}
+.tirai.buka{opacity:1;pointer-events:auto}
+.lembar{position:fixed;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:var(--malam);border-radius:24px 24px 0 0;border-top:1px solid var(--garis);
+  z-index:41;transform:translateY(100%);visibility:hidden;transition:transform .3s cubic-bezier(.2,.8,.2,1),visibility 0s .3s;padding:10px 18px calc(24px + env(safe-area-inset-bottom))}
+.lembar.buka{transform:none;visibility:visible;transition:transform .3s cubic-bezier(.2,.8,.2,1),visibility 0s}
+.lembar .pegangan{width:44px;height:5px;border-radius:5px;background:var(--garis);margin:0 auto 14px}
+.lembar .isi{max-width:560px;margin:0 auto}
+.foto-besar{width:140px;height:140px;margin:0 auto 14px}
+.foto-besar .ava{font-size:48px;border-width:3px;border-color:var(--emas-redup)}
+.detail-nama{text-align:center;font-size:24px}
+.detail-sub{text-align:center;color:var(--redup);margin-top:2px}
+.detail-hub{display:flex;justify-content:center;margin:10px 0 4px}
+.bagian{margin-top:18px}
+.bagian h3{font-size:15px;font-family:var(--sans);font-weight:700;color:var(--redup);margin-bottom:8px}
+.kerabat{display:flex;flex-wrap:wrap;gap:8px}
+.kerabat button{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;border-radius:999px;background:var(--malam2);border:1px solid var(--garis);font-size:14px;font-weight:600}
+.kerabat .ava{width:28px;height:28px;font-size:12px;border-width:1px}
+.kerabat small{color:var(--redup);font-weight:500}
+.catatan{white-space:pre-wrap;font-size:15px}
+.obrolan li{margin-bottom:6px}
+.obrolan{padding-left:20px;margin:0}
+
+/* pohon */
+.pohon{margin-top:8px}
+.simpul{position:relative}
+.anak-anak{margin-left:20px;padding-left:14px;border-left:1px dashed var(--garis)}
+.baris-simpul{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-radius:14px}
+.lipat{margin-top:6px;width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--redup);flex-shrink:0}
+.lipat svg{width:14px;height:14px;transition:transform .2s}
+.lipat[aria-expanded="false"] svg{transform:rotate(-90deg)}
+.lipat.daun{visibility:hidden}
+.pasangan-simpul{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.org-simpul{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border-radius:999px;background:var(--malam2);border:1px solid var(--garis);font-size:14px;font-weight:600;text-align:left}
+.org-simpul .ava{width:30px;height:30px;font-size:13px;border-width:1px}
+.org-simpul.saya{border-color:var(--emas);box-shadow:0 0 0 2px rgba(224,176,75,.25)}
+.nikah{color:var(--emas);font-size:14px}
+.pas-wrap{display:inline-flex;align-items:center;gap:6px}
+.kilat{animation:kilat 1.4s ease}
+@keyframes kilat{0%,100%{background:transparent}30%{background:rgba(224,176,75,.18)}}
+
+/* ngobrol */
+.tip-judul{font-size:20px;margin:6px 0 8px}
+.kat{font-size:13px;color:var(--emas);font-weight:600}
+.situasi{font-family:var(--serif);font-size:19px;line-height:1.45;margin:8px 0 4px}
+.rak summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--garis);font-weight:700}
+.rak summary::-webkit-details-marker{display:none}
+.rak[open] summary{color:var(--emas)}
+.rak .tip{padding:12px 0;border-bottom:1px solid rgba(56,70,122,.5)}
+.rak .tip b{display:block;margin-bottom:2px}
+
+/* layar khusus */
+.tengah{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:24px}
+.denyut{animation:denyut 1.6s ease-in-out infinite}
+@keyframes denyut{50%{opacity:.45}}
+.skor{font-family:var(--serif);font-size:56px;font-weight:700;line-height:1}
+.toast{position:fixed;left:50%;bottom:calc(var(--nav) + 18px);transform:translateX(-50%);background:var(--mawar);color:#2a0b0b;font-weight:700;padding:10px 16px;border-radius:12px;z-index:60;font-size:14px;max-width:90vw}
+canvas#konfeti{position:fixed;inset:0;pointer-events:none;z-index:70}
+[hidden]{display:none !important}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+</style>
+</head>
+<body>
+<main id="app" class="wrap"><div class="tengah"><div class="lontar besar"><div class="tulisan denyut">Membuka ingatan…</div></div></div></main>
+
+<nav id="nav" hidden>
+  <button data-tab="latihan" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="14" height="14" rx="3"/><path d="M7 3h11a3 3 0 0 1 3 3v11"/></svg>Latihan</button>
+  <button data-tab="orang"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6"/><path d="M16 4a4 4 0 0 1 0 8M19 15c2 .8 3 2.6 3 6"/></svg>Orang</button>
+  <button data-tab="pohon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="4.5" r="2.5"/><circle cx="5" cy="19.5" r="2.5"/><circle cx="19" cy="19.5" r="2.5"/><path d="M12 7v5M5 17v-2.5h14V17M12 12v2.5"/></svg>Pohon</button>
+  <button data-tab="ngobrol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v10H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>Ngobrol</button>
+</nav>
+
+<div class="tirai" id="tirai"></div>
+<section class="lembar" id="lembar" role="dialog" aria-modal="true"><div class="pegangan"></div><div class="isi" id="lembarIsi"></div></section>
+<canvas id="konfeti" hidden></canvas>
+
+<script>
+'use strict';
+const tg = window.Telegram && window.Telegram.WebApp;
+const API_URL = window.INGAT_API;
+const KELOLA = new URL('kelola.html', location.href).href;
+const HARI = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+const SAPAAN = ['i','ni','pak','bu','bli','mbok','gede','putu','wayan','made','kadek','nengah','nyoman','komang','ketut','luh','ida','bagus','ayu','gusti','anak','agung','dewa','desak','jero'];
+const FORD = [
+  'Tanya pekerjaannya: "Lagi sibuk apa sekarang?"',
+  'Tanya hobinya: "Akhir pekan biasanya ngapain?"',
+  'Tanya keluarganya: "Gimana kabar keluarga?"',
+  'Tanya rencananya: "Ada rencana akhir tahun?"',
+  'Tanya pengalamannya: "Apa hal paling seru bulan ini?"',
+  'Minta rekomendasi: "Tempat makan enak di sekitar sini di mana ya?"'
+];
+
+const S = { data: null, idx: {}, tab: 'latihan', sesi: null, filter: 'semua', cari: '', lipat: {}, sken: null, antreKirim: Promise.resolve() };
+const $ = (s, el) => (el || document).querySelector(s);
+const app = $('#app');
+
+// ---------- utilitas ----------
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+const acak = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const ids = s => String(s || '').split(',').map(x => x.trim()).filter(Boolean);
+const getar = (t) => { try { if (t === 'ok') tg.HapticFeedback.notificationOccurred('success'); else if (t === 'no') tg.HapticFeedback.notificationOccurred('error'); else tg.HapticFeedback.impactOccurred('light'); } catch (e) { } };
+function monogram(o) {
+  const t = norm(o.Panggilan || o.Nama).split(' ').filter(Boolean);
+  const k = t.filter(x => SAPAAN.indexOf(x) < 0);
+  const p = (k.length ? k : t);
+  return ((p[0] || '?')[0] + (p[1] ? p[1][0] : '')).toUpperCase();
+}
+function ava(o) {
+  return '<span class="ava">' + (o.Foto ? '<img src="' + o.Foto + '" alt="" loading="lazy">' : esc(monogram(o))) + '</span>';
+}
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg; document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3200);
+}
+const jatuhTempo = o => !o.JatuhTempo || new Date(o.JatuhTempo) <= new Date();
+
+async function api(action, data) {
+  const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action, data: data || {}, initData: tg ? tg.initData : '' }) });
+  const j = await res.json();
+  if (!j.ok) throw new Error(j.err || 'Gagal menghubungi server.');
+  return j;
+}
+
+// ---------- data keluarga ----------
+function indeks() {
+  S.idx = {};
+  S.data.orang.forEach(o => S.idx[o.ID] = o);
+}
+const ortuDari = o => [S.idx[o.Ayah], S.idx[o.Ibu]].filter(Boolean);
+const pasDari = o => ids(o.Pasangan).map(id => S.idx[id]).filter(Boolean);
+const anakDari = o => S.data.orang.filter(c => c.Ayah === o.ID || c.Ibu === o.ID);
+const saudaraDari = o => (!o.Ayah && !o.Ibu) ? [] : S.data.orang.filter(x => x.ID !== o.ID && ((o.Ayah && x.Ayah === o.Ayah) || (o.Ibu && x.Ibu === o.Ibu)));
+const bisaDiuji = o => o.ID !== S.data.saya && !!(o.Foto || o.Ayah || o.Ibu || o.Pasangan || o.Konteks || anakDari(o).length);
+
+function deskripsi(o) {
+  const b = [];
+  const ortu = ortuDari(o);
+  if (ortu.length) b.push((o.JK === 'L' ? 'Anak laki-laki' : o.JK === 'P' ? 'Anak perempuan' : 'Anak') + ' dari ' + ortu.map(x => x.Nama).join(' & '));
+  const ps = pasDari(o);
+  if (ps.length) b.push((o.JK === 'L' ? 'Suami' : o.JK === 'P' ? 'Istri' : 'Pasangan') + ' dari ' + ps.map(x => x.Nama).join(' & '));
+  const ak = anakDari(o);
+  if (ak.length) b.push((o.JK === 'L' ? 'Ayah' : o.JK === 'P' ? 'Ibu' : 'Orang tua') + ' dari ' + ak.slice(0, 3).map(x => x.Nama).join(', ') + (ak.length > 3 ? ', dan lainnya' : ''));
+  if (o.Konteks) b.push(o.Konteks);
+  return b.join('. ');
+}
+
+// ---------- mulai ----------
+async function mulai() {
+  if (tg) {
+    tg.ready(); tg.expand();
+    try { tg.setHeaderColor('#1B2440'); tg.setBackgroundColor('#1B2440'); tg.setBottomBarColor && tg.setBottomBarColor('#1B2440'); } catch (e) { }
+    tg.BackButton.onClick(tutupLembar);
+  }
+  if (!API_URL || API_URL.indexOf('ISI_') === 0) return layarPesan('Alamat server belum diisi', 'Buka file config.js di GitHub dan isi alamat Apps Script-mu.');
+  if (!tg || !tg.initData) return layarPesan('Buka lewat Telegram', 'Aplikasi ini hanya bisa dibuka dari tombol Latihan di bot Telegram-mu.');
+  try {
+    S.data = await api('boot');
+    indeks();
+    $('#nav').hidden = false;
+    render();
+  } catch (e) {
+    layarPesan('Belum bisa terhubung', e.message, true);
+  }
+}
+
+function layarPesan(judul, isi, ulang) {
+  app.innerHTML = '<div class="tengah"><h2>' + esc(judul) + '</h2><p class="redup">' + esc(isi) + '</p>' +
+    (ulang ? '<button class="btn btn-garis" style="max-width:240px" onclick="location.reload()">Coba lagi</button>' : '') + '</div>';
+}
+
+document.querySelectorAll('#nav button').forEach(b => b.addEventListener('click', () => {
+  if (S.sesi && !S.sesi.selesai && !confirm('Keluar dari latihan? Jawaban yang sudah masuk tetap tersimpan.')) return;
+  S.sesi = null;
+  S.tab = b.dataset.tab;
+  document.querySelectorAll('#nav button').forEach(x => x.removeAttribute('aria-current'));
+  b.setAttribute('aria-current', 'page');
+  getar();
+  render();
+  window.scrollTo(0, 0);
+}));
+
+function render() {
+  if (S.tab === 'latihan') return S.sesi ? renderSesi() : renderBeranda();
+  if (S.tab === 'orang') return renderOrang();
+  if (S.tab === 'pohon') return renderPohon();
+  if (S.tab === 'ngobrol') return renderNgobrol();
+}
+
+function apiHtml(st) {
+  return '<span class="api' + (st.streak ? '' : ' padam') + '" title="Hari beruntun"><svg viewBox="0 0 24 24" fill="' + (st.streak ? '#E0B04B' : 'none') + '" stroke="' + (st.streak ? '#E0B04B' : 'currentColor') + '" stroke-width="1.6"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-7 0 2 1 3 2 3 0-3 0-5 1-8z"/></svg>' + st.streak + '</span>';
+}
+
+// ---------- BERANDA LATIHAN ----------
+function renderBeranda() {
+  const st = S.data.stat;
+  const deck = kartuJatuhTempo();
+  const maks = Math.max(5, ...st.minggu.map(m => m.d));
+  const kini = new Date();
+  const total = S.data.orang.length + S.data.fakta.length;
+  let h = '<div class="kepala"><h1>' + salam() + '</h1>' + apiHtml(st) + '</div>';
+
+  if (!total) {
+    h += '<div class="tengah" style="min-height:50vh"><div class="lontar besar"><div class="tulisan">Masih kosong</div></div>' +
+      '<p class="redup">Tambahkan dirimu, keluarga, dan kenalan di halaman Kelola. Kartu latihan muncul otomatis.</p>' +
+      '<button class="btn btn-emas" onclick="bukaKelola()">Buka Kelola</button></div>';
+    app.innerHTML = h; return;
+  }
+
+  h += '<div class="lontar besar"><div class="tulisan">' + (deck.length ? deck.length + ' kartu menunggu' : 'Semua sudah dilatih') + '</div></div>';
+  h += '<p class="redup kecil" style="text-align:center;margin:12px 0 18px">' +
+    (deck.length ? 'Kartu yang sering kamu jawab benar akan makin jarang muncul.' : 'Kartu berikutnya muncul sesuai jadwalnya. Mau latihan bebas tanpa memengaruhi jadwal?') + '</p>';
+  h += deck.length
+    ? '<button class="btn btn-emas" onclick="mulaiSesi(false)">Mulai latihan</button>'
+    : '<button class="btn btn-garis" onclick="mulaiSesi(true)">Latihan bebas</button>';
+
+  h += '<div class="jarak"></div><div class="panel"><div style="display:flex;justify-content:space-between;align-items:baseline"><h3>Tujuh hari terakhir</h3><span class="redup kecil">' +
+    st.hariIni.d + ' dijawab hari ini</span></div><div class="minggu">';
+  st.minggu.forEach((m, i) => {
+    const t = new Date(m.t + 'T00:00:00');
+    const tinggi = Math.round(m.d / maks * 100);
+    h += '<div class="hari' + (i === 6 ? ' kini' : '') + '"><div class="batang" style="height:100%"><i style="height:' + tinggi + '%"></i></div><span>' + HARI[t.getDay()] + '</span></div>';
+  });
+  h += '</div></div>';
+
+  const tip = tipHariIni();
+  if (tip) {
+    h += '<div class="jarak"></div><div class="panel"><div class="kat">Tips hari ini · ' + esc(tip.Kategori) + '</div><h3 class="tip-judul">' + esc(tip.Judul) + '</h3><p style="margin:0">' + esc(tip.Isi) + '</p></div>';
+  }
+  h += '<div class="jarak"></div><p class="redup kecil" style="text-align:center">' + st.keluarga + ' keluarga, ' + st.kenalan + ' kenalan, ' + st.jumlahFakta + ' fakta tersimpan</p>';
+  app.innerHTML = h;
+  void kini;
+}
+
+function salam() {
+  const j = new Date().getHours();
+  return j < 11 ? 'Selamat pagi' : j < 15 ? 'Selamat siang' : j < 19 ? 'Selamat sore' : 'Selamat malam';
+}
+
+function tipHariIni() {
+  const t = S.data.tips.filter(x => x.Isi);
+  if (!t.length) return null;
+  return t[Math.floor(Date.now() / 86400000) % t.length];
+}
+
+function kartuJatuhTempo() {
+  const o = S.data.orang.filter(x => bisaDiuji(x) && jatuhTempo(x)).map(x => ({ j: 'orang', o: x }));
+  const f = S.data.fakta.filter(x => x.Pertanyaan && x.Jawaban && jatuhTempo(x)).map(x => ({ j: 'fakta', o: x }));
+  return acak(o.concat(f)).slice(0, 15);
+}
+
+// ---------- SESI LATIHAN ----------
+function mulaiSesi(bebas) {
+  let deck = bebas
+    ? acak(S.data.orang.filter(bisaDiuji).map(x => ({ j: 'orang', o: x })).concat(S.data.fakta.filter(x => x.Pertanyaan && x.Jawaban).map(x => ({ j: 'fakta', o: x })))).slice(0, 10)
+    : kartuJatuhTempo();
+  if (!deck.length) return toast('Belum ada kartu. Tambahkan orang atau fakta di Kelola.');
+  deck = deck.map(k => Object.assign(k, { bebas: bebas }));
+  S.sesi = { deck: deck, i: 0, benar: 0, dijawab: 0, ulang: [], selesai: false, total: deck.length };
+  getar();
+  siapkanKartu();
+}
+
+function siapkanKartu() {
+  const s = S.sesi;
+  const k = s.deck[s.i];
+  k.dijawab = false;
+  if (k.j === 'orang') {
+    const o = k.o;
+    let pool = S.data.orang.filter(x => x.ID !== o.ID && norm(x.Nama) !== norm(o.Nama));
+    const mirip = acak(pool.filter(x => x.Jenis === o.Jenis && (!o.JK || x.JK === o.JK)));
+    const lain = acak(pool.filter(x => mirip.indexOf(x) < 0));
+    const pengecoh = mirip.concat(lain).slice(0, 3).map(x => x.Nama);
+    k.mode = pengecoh.length >= 3 ? 'pilih' : 'balik';
+    k.opsi = acak(pengecoh.concat([o.Nama]));
+    k.kunci = o.Nama;
+  } else {
+    const f = k.o;
+    const pool = acak(S.data.fakta.filter(x => x.ID !== f.ID && x.Kategori === f.Kategori && norm(x.Jawaban) !== norm(f.Jawaban)).map(x => x.Jawaban));
+    const unik = pool.filter((v, i) => pool.indexOf(v) === i).slice(0, 3);
+    k.mode = unik.length >= 3 ? 'pilih' : 'balik';
+    k.opsi = acak(unik.concat([f.Jawaban]));
+    k.kunci = f.Jawaban;
+  }
+  renderSesi();
+}
+
+function renderSesi() {
+  const s = S.sesi;
+  if (s.selesai) return renderSelesai();
+  const k = s.deck[s.i];
+  const o = k.o;
+  const persen = Math.round(s.i / s.deck.length * 100);
+  let h = '<div class="kepala-sesi"><button class="redup kecil" onclick="keluarSesi()">Berhenti</button><span class="redup kecil">' + (s.i + 1) + ' / ' + s.deck.length + (k.ulang ? ' · ulangan' : '') + '</span></div>';
+  h += '<div class="progres"><i style="width:' + persen + '%"></i></div><div class="kartu-sesi">';
+
+  if (k.j === 'orang') {
+    if (o.Foto) {
+      h += '<div class="bingkai"><img src="' + o.Foto + '" alt="Foto orang yang harus ditebak"></div>';
+    } else {
+      h += '<div class="tanya"><div class="label">Siapa dia?</div><div class="isi">' + esc(deskripsi(o)) + '</div></div>';
+    }
+  } else {
+    h += '<div class="tanya"><div class="label">' + esc(o.Kategori || 'Pengetahuan umum') + '</div><div class="isi">' + esc(o.Pertanyaan) + '</div></div>';
+  }
+  h += '<div class="lontar"><div class="tulisan kosong" id="tulisan">• • •</div></div></div>';
+
+  if (k.mode === 'pilih') {
+    h += '<div class="pilihan" id="pilihan">' + k.opsi.map((t, i) => '<button data-i="' + i + '">' + esc(t) + '</button>').join('') + '</div>';
+  } else {
+    h += '<div class="pilihan" id="pilihan"><button class="btn btn-garis" style="text-align:center" onclick="tunjukkan()">Tunjukkan jawaban</button></div>';
+  }
+  h += '<div id="hasil"></div>';
+  app.innerHTML = h;
+  if (k.mode === 'pilih') {
+    app.querySelectorAll('#pilihan button').forEach(b => b.addEventListener('click', () => pilih(Number(b.dataset.i))));
+  }
+}
+
+function tulisLontar(teks) {
+  const el = $('#tulisan');
+  if (!el) return;
+  el.classList.remove('kosong');
+  el.innerHTML = Array.from(teks).map((c, i) => '<span class="huruf" style="animation-delay:' + (i * 28) + 'ms">' + (c === ' ' ? '&nbsp;' : esc(c)) + '</span>').join('');
+}
+
+function pilih(i) {
+  const s = S.sesi, k = s.deck[s.i];
+  if (k.dijawab) return;
+  const benar = k.opsi[i] === k.kunci;
+  app.querySelectorAll('#pilihan button').forEach((b, j) => {
+    b.disabled = true;
+    if (k.opsi[j] === k.kunci) b.classList.add('benar');
+    else if (j === i) b.classList.add('salah');
+  });
+  selesaikanKartu(benar);
+}
+
+function tunjukkan() {
+  const s = S.sesi, k = s.deck[s.i];
+  tulisLontar(k.kunci);
+  $('#pilihan').innerHTML = '<p class="redup kecil" style="text-align:center;margin:0">Jujur ya, tadi kamu ingat?</p><div class="baris-btn">' +
+    '<button class="btn btn-garis" onclick="nilaiSendiri(false)">Lupa</button><button class="btn btn-emas" onclick="nilaiSendiri(true)">Ingat</button></div>';
+  getar();
+}
+
+function nilaiSendiri(benar) {
+  $('#pilihan').innerHTML = '';
+  selesaikanKartu(benar, true);
+}
+
+function selesaikanKartu(benar, sudahDitulis) {
+  const s = S.sesi, k = s.deck[s.i], o = k.o;
+  k.dijawab = true;
+  if (!sudahDitulis) tulisLontar(k.kunci);
+  getar(benar ? 'ok' : 'no');
+  if (!k.ulang) { s.dijawab++; if (benar) s.benar++; }
+  if (!benar && !k.ulang) s.deck.push({ j: k.j, o: o, ulang: true, bebas: true });
+
+  // kirim ke server di belakang layar (latihan bebas & ulangan tidak mengubah jadwal)
+  if (!k.bebas && !k.ulang) {
+    S.antreKirim = S.antreKirim.then(() => api('jawab', { jenis: k.j, id: o.ID, benar: benar }).then(r => {
+      o.Level = r.Level; o.JatuhTempo = r.JatuhTempo; S.data.stat = r.stat;
+    })).catch(e => toast('Jawaban belum tersimpan: ' + e.message));
+  }
+
+  let h = '<div class="hasil"><div class="vonis ' + (benar ? 'ok' : 'no') + '">' + (benar ? 'Betul.' : 'Belum tepat, nanti diulang sekali lagi.') + '</div>';
+  if (k.j === 'orang') {
+    if (o.Panggilan) h += infoBaris('Panggilan', o.Panggilan);
+    if (o.hub) h += '<div style="margin:8px 0 4px"><span class="chip">' + esc(o.hub) + ' bagimu</span></div>';
+    if (o.Foto) { const d = deskripsi(o); if (d) h += infoBaris('Siapa', d); }
+    if (o.Jembatan) h += infoBaris('Jembatan', o.Jembatan);
+    const cat = String(o.Catatan || '').split('\n').filter(Boolean);
+    if (cat.length) h += infoBaris('Catatan', cat[cat.length - 1]);
+  } else if (o.Penjelasan) {
+    h += '<p style="margin:4px 0 0">' + esc(o.Penjelasan) + '</p>';
+  }
+  h += '</div><div class="jarak"></div><button class="btn btn-emas" id="lanjut">' + (s.i + 1 < s.deck.length ? 'Kartu berikutnya' : 'Lihat hasil') + '</button>';
+  $('#hasil').innerHTML = h;
+  $('#lanjut').addEventListener('click', lanjut);
+  setTimeout(() => { const el = $('#lanjut'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'end' }); }, 250);
+}
+
+function infoBaris(l, v) { return '<div class="info-baris"><b>' + esc(l) + '</b><span>' + esc(v) + '</span></div>'; }
+
+function lanjut() {
+  const s = S.sesi;
+  s.i++;
+  if (s.i >= s.deck.length) { s.selesai = true; renderSelesai(); return; }
+  getar();
+  siapkanKartu();
+  window.scrollTo(0, 0);
+}
+
+function keluarSesi() {
+  if (!confirm('Berhenti latihan? Jawaban yang sudah masuk tetap tersimpan.')) return;
+  S.sesi = null; render();
+}
+
+async function renderSelesai() {
+  const s = S.sesi;
+  app.innerHTML = '<div class="tengah"><div class="denyut redup">Menyimpan…</div></div>';
+  await S.antreKirim;
+  const sempurna = s.dijawab && s.benar === s.dijawab;
+  const st = S.data.stat;
+  app.innerHTML = '<div class="tengah"><div class="skor">' + s.benar + '<span class="redup" style="font-size:28px"> / ' + s.dijawab + '</span></div>' +
+    '<div class="lontar" style="width:100%"><div class="tulisan">' + (sempurna ? 'Ingatanmu tajam hari ini' : s.benar / Math.max(1, s.dijawab) >= .6 ? 'Makin nempel' : 'Pelan-pelan, pasti bisa') + '</div></div>' +
+    '<p class="redup">' + (st.streak ? 'Beruntun ' + st.streak + ' hari. ' : '') + 'Kartu yang salah muncul lagi besok.</p>' +
+    '<button class="btn btn-emas" onclick="S.sesi=null;render()">Selesai</button></div>';
+  if (s.benar > 0) konfeti(sempurna ? 140 : 70);
+}
+
+// ---------- TAB ORANG ----------
+function renderOrang() {
+  const q = norm(S.cari);
+  let list = S.data.orang.slice();
+  if (S.filter !== 'semua') list = list.filter(o => o.Jenis === S.filter);
+  if (q) list = list.filter(o => norm(o.Nama + ' ' + o.Panggilan + ' ' + o.Konteks + ' ' + o.hub).indexOf(q) >= 0);
+  list.sort((a, b) => a.Nama.localeCompare(b.Nama));
+  let h = '<div class="kepala"><h1>Orang</h1>' + apiHtml(S.data.stat) + '</div>' +
+    '<input class="cari" id="cari" type="search" placeholder="Cari nama, panggilan, atau tempat kenal" value="' + esc(S.cari) + '" aria-label="Cari orang">' +
+    '<div class="saring">' + [['semua', 'Semua'], ['keluarga', 'Keluarga'], ['kenalan', 'Kenalan']].map(f =>
+      '<button data-f="' + f[0] + '" aria-pressed="' + (S.filter === f[0]) + '">' + f[1] + '</button>').join('') + '</div>';
+  if (!list.length) {
+    h += '<div class="tengah" style="min-height:40vh"><p class="redup">' + (S.data.orang.length ? 'Tidak ada yang cocok.' : 'Belum ada orang. Tambahkan di Kelola.') + '</p>' +
+      (S.data.orang.length ? '' : '<button class="btn btn-emas" style="max-width:240px" onclick="bukaKelola()">Buka Kelola</button>') + '</div>';
+  } else {
+    h += '<div class="grid">' + list.map(o => '<button class="orang" data-id="' + o.ID + '">' + ava(o) +
+      '<span class="nm">' + esc(o.Panggilan || o.Nama) + '</span>' + (o.hub ? '<span class="hb">' + esc(o.hub) + '</span>' : '') + '</button>').join('') + '</div>';
+  }
+  app.innerHTML = h;
+  const c = $('#cari');
+  c.addEventListener('input', () => { S.cari = c.value; const pos = c.selectionStart; renderOrang(); const c2 = $('#cari'); c2.focus(); c2.setSelectionRange(pos, pos); });
+  app.querySelectorAll('.saring button').forEach(b => b.addEventListener('click', () => { S.filter = b.dataset.f; getar(); renderOrang(); }));
+  app.querySelectorAll('.orang').forEach(b => b.addEventListener('click', () => bukaOrang(b.dataset.id)));
+}
+
+// ---------- LEMBAR DETAIL ----------
+function bukaOrang(id) {
+  const o = S.idx[id];
+  if (!o) return;
+  getar();
+  const chip = (x, ket) => '<button data-id="' + x.ID + '">' + ava(x) + '<span>' + esc(x.Panggilan || x.Nama) + (ket ? ' <small>' + esc(ket) + '</small>' : '') + '</span></button>';
+  let h = '<div class="foto-besar">' + ava(o) + '</div><h2 class="detail-nama">' + esc(o.Nama) + '</h2>';
+  if (o.Panggilan) h += '<div class="detail-sub">Dipanggil ' + esc(o.Panggilan) + '</div>';
+  if (o.ID === S.data.saya) h += '<div class="detail-hub"><span class="chip">Ini kamu</span></div>';
+  else if (o.hub) h += '<div class="detail-hub"><span class="chip">' + esc(o.hub) + ' bagimu</span></div>';
+  else if (o.Jenis === 'kenalan') h += '<div class="detail-hub"><span class="chip">Kenalan</span></div>';
+
+  const ortu = ortuDari(o), ps = pasDari(o), sd = saudaraDari(o), ak = anakDari(o);
+  if (ortu.length || ps.length || sd.length || ak.length) {
+    h += '<div class="bagian"><h3>Keluarga</h3><div class="kerabat">' +
+      ortu.map(x => chip(x, x.ID === o.Ayah ? 'ayah' : 'ibu')).join('') +
+      ps.map(x => chip(x, 'pasangan')).join('') +
+      sd.map(x => chip(x, 'saudara')).join('') +
+      ak.map(x => chip(x, 'anak')).join('') + '</div></div>';
+  }
+  if (o.Konteks) h += '<div class="bagian"><h3>Kenal di mana</h3><p class="catatan" style="margin:0">' + esc(o.Konteks) + '</p></div>';
+  if (o.Jembatan) h += '<div class="bagian"><h3>Jembatan ingatan</h3><p class="catatan" style="margin:0">' + esc(o.Jembatan) + '</p></div>';
+  const cat = String(o.Catatan || '').split('\n').filter(Boolean);
+  if (cat.length) h += '<div class="bagian"><h3>Catatan</h3><p class="catatan" style="margin:0">' + esc(cat.join('\n')) + '</p></div>';
+  if (o.ID !== S.data.saya) {
+    const saran = [];
+    if (cat.length) saran.push('Tanyakan kelanjutan: "' + cat[cat.length - 1].replace(/^\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}:?\s*/, '') + '"');
+    acak(FORD).slice(0, cat.length ? 1 : 2).forEach(x => saran.push(x));
+    saran.push('Sebut namanya saat menyapa dan saat pamit.');
+    h += '<div class="bagian"><h3>Bahan obrolan</h3><ul class="obrolan">' + saran.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>';
+  }
+  h += '<div class="bagian"><button class="btn btn-garis" onclick="bukaKelola(\'' + o.ID + '\')">Ubah di Kelola</button></div>';
+  $('#lembarIsi').innerHTML = h;
+  $('#lembarIsi').querySelectorAll('.kerabat button').forEach(b => b.addEventListener('click', () => { $('#lembar').scrollTop = 0; bukaOrang(b.dataset.id); }));
+  $('#tirai').classList.add('buka'); $('#lembar').classList.add('buka');
+  if (tg) tg.BackButton.show();
+}
+
+function tutupLembar() {
+  $('#tirai').classList.remove('buka'); $('#lembar').classList.remove('buka');
+  if (tg) tg.BackButton.hide();
+}
+$('#tirai').addEventListener('click', tutupLembar);
+
+function bukaKelola(id) {
+  const url = KELOLA + (id ? '#orang-' + id : '');
+  if (tg && tg.openLink) tg.openLink(url); else window.open(url, '_blank');
+}
+
+// ---------- TAB POHON ----------
+function akarPohon() {
+  return S.data.orang.filter(o => o.Jenis !== 'kenalan' && !o.Ayah && !o.Ibu && !pasDari(o).some(s => s.Ayah || s.Ibu))
+    .sort((a, b) => Number(a.ID) - Number(b.ID));
+}
+function anakPohon(o) {
+  const semua = [o.ID].concat(ids(o.Pasangan));
+  return S.data.orang.filter(c => semua.indexOf(c.Ayah) >= 0 || semua.indexOf(c.Ibu) >= 0).sort((a, b) => Number(a.ID) - Number(b.ID));
+}
+
+function renderPohon() {
+  const keluarga = S.data.orang.filter(o => o.Jenis !== 'kenalan');
+  let h = '<div class="kepala"><h1>Pohon keluarga</h1>' + apiHtml(S.data.stat) + '</div>';
+  if (!keluarga.length) {
+    app.innerHTML = h + '<div class="tengah" style="min-height:40vh"><p class="redup">Belum ada anggota keluarga. Tambahkan di Kelola, lalu atur ayah, ibu, dan pasangannya.</p><button class="btn btn-emas" style="max-width:240px" onclick="bukaKelola()">Buka Kelola</button></div>';
+    return;
+  }
+  if (S.data.saya && S.idx[S.data.saya]) h += '<button class="btn btn-garis" onclick="lompatKeSaya()">Tunjukkan posisiku</button>';
+  const visited = {};
+  h += '<div class="pohon">' + akarPohon().map(o => visited[o.ID] ? '' : simpulHtml(o, visited)).join('') + '</div>';
+  const sisa = keluarga.filter(o => !visited[o.ID]);
+  if (sisa.length) h += '<div class="bagian"><h3>Belum terhubung</h3><div class="kerabat">' + sisa.map(o => '<button data-id="' + o.ID + '">' + ava(o) + '<span>' + esc(o.Nama) + '</span></button>').join('') + '</div></div>';
+  app.innerHTML = h;
+  app.querySelectorAll('[data-id]').forEach(b => b.addEventListener('click', () => bukaOrang(b.dataset.id)));
+  app.querySelectorAll('.lipat:not(.daun)').forEach(b => b.addEventListener('click', () => {
+    const id = b.dataset.lipat;
+    S.lipat[id] = !S.lipat[id];
+    b.setAttribute('aria-expanded', String(!S.lipat[id]));
+    $('#anak-' + id).hidden = !!S.lipat[id];
+    getar();
+  }));
+}
+
+function simpulHtml(o, visited) {
+  if (visited[o.ID]) return '';
+  visited[o.ID] = true;
+  const ps = pasDari(o);
+  ps.forEach(s => visited[s.ID] = true);
+  const kids = anakPohon(o).filter(k => !visited[k.ID]);
+  const tertutup = !!S.lipat[o.ID];
+  const orgBtn = x => '<button class="org-simpul' + (x.ID === S.data.saya ? ' saya' : '') + '" data-id="' + x.ID + '" id="n-' + x.ID + '">' + ava(x) + '<span>' + esc(x.Panggilan || x.Nama) + '</span></button>';
+  let h = '<div class="simpul"><div class="baris-simpul"><button class="lipat' + (kids.length ? '' : ' daun') + '" data-lipat="' + o.ID + '" aria-expanded="' + !tertutup + '" aria-label="Buka atau tutup keturunan">' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg></button><div class="pasangan-simpul">' + orgBtn(o) +
+    ps.map(s => '<span class="pas-wrap"><span class="nikah" aria-label="menikah dengan">⚭</span>' + orgBtn(s) + '</span>').join('') + '</div></div>';
+  if (kids.length) h += '<div class="anak-anak" id="anak-' + o.ID + '"' + (tertutup ? ' hidden' : '') + '>' + kids.map(k => simpulHtml(k, visited)).join('') + '</div>';
+  return h + '</div>';
+}
+
+function lompatKeSaya() {
+  const el = document.getElementById('n-' + S.data.saya);
+  if (!el) return toast('Posisimu belum terhubung ke pohon.');
+  let p = el.parentElement;
+  while (p && p !== app) {
+    if (p.classList.contains('anak-anak') && p.hidden) {
+      p.hidden = false;
+      const id = p.id.replace('anak-', '');
+      S.lipat[id] = false;
+      const b = app.querySelector('[data-lipat="' + id + '"]');
+      if (b) b.setAttribute('aria-expanded', 'true');
+    }
+    p = p.parentElement;
+  }
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const baris = el.closest('.baris-simpul');
+  baris.classList.remove('kilat'); void baris.offsetWidth; baris.classList.add('kilat');
+  getar();
+}
+
+// ---------- TAB NGOBROL ----------
+function renderNgobrol() {
+  let h = '<div class="kepala"><h1>Ngobrol</h1>' + apiHtml(S.data.stat) + '</div>';
+  const tip = tipHariIni();
+  if (tip) h += '<div class="panel"><div class="kat">Tips hari ini · ' + esc(tip.Kategori) + '</div><h3 class="tip-judul">' + esc(tip.Judul) + '</h3><p style="margin:0">' + esc(tip.Isi) + '</p></div><div class="jarak"></div>';
+  h += '<div class="panel" id="sken"></div><div class="jarak"></div>';
+  const grup = {};
+  S.data.tips.filter(t => t.Isi).forEach(t => { (grup[t.Kategori || 'Lainnya'] = grup[t.Kategori || 'Lainnya'] || []).push(t); });
+  h += '<h2 style="margin:8px 0 4px">Semua tips</h2>';
+  Object.keys(grup).forEach(k => {
+    h += '<details class="rak"><summary>' + esc(k) + '<span class="redup kecil">' + grup[k].length + '</span></summary>' +
+      grup[k].map(t => '<div class="tip"><b>' + esc(t.Judul) + '</b>' + esc(t.Isi) + '</div>').join('') + '</details>';
+  });
+  app.innerHTML = h;
+  renderSkenario();
+}
+
+function renderSkenario() {
+  const box = $('#sken');
+  const list = S.data.skenario.filter(x => x.Situasi && x.PilihanA);
+  if (!list.length) { box.innerHTML = '<p class="redup" style="margin:0">Belum ada latihan situasi. Tambahkan di Kelola.</p>'; return; }
+  if (!S.sken || !S.sken.urutan.length) S.sken = { urutan: acak(list.map(x => x.ID)) };
+  const sk = list.filter(x => x.ID === S.sken.urutan[0])[0] || list[0];
+  const opsi = acak([['A', sk.PilihanA], ['B', sk.PilihanB], ['C', sk.PilihanC]]);
+  box.innerHTML = '<div class="kat">Latihan situasi</div><p class="situasi">' + esc(sk.Situasi) + '</p><p class="redup kecil" style="margin:0 0 4px">Mana yang paling pas?</p>' +
+    '<div class="pilihan">' + opsi.map(o => '<button data-k="' + o[0] + '">' + esc(o[1]) + '</button>').join('') + '</div><div id="skenHasil"></div>';
+  box.querySelectorAll('.pilihan button').forEach(b => b.addEventListener('click', () => {
+    const benar = b.dataset.k === sk.Kunci;
+    box.querySelectorAll('.pilihan button').forEach(x => {
+      x.disabled = true;
+      if (x.dataset.k === sk.Kunci) x.classList.add('benar'); else if (x === b) x.classList.add('salah');
+    });
+    getar(benar ? 'ok' : 'no');
+    $('#skenHasil').innerHTML = '<div class="hasil"><div class="vonis ' + (benar ? 'ok' : 'no') + '">' + (benar ? 'Pas.' : 'Kurang pas.') + '</div><p style="margin:0">' + esc(sk.Penjelasan) +
+      '</p></div><div class="jarak"></div><button class="btn btn-emas" id="skenLanjut">Situasi berikutnya</button>';
+    $('#skenLanjut').addEventListener('click', () => { S.sken.urutan.shift(); getar(); renderSkenario(); $('#sken').scrollIntoView({ behavior: 'smooth' }); });
+  }));
+}
+
+// ---------- konfeti ----------
+function konfeti(n) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const c = $('#konfeti'); c.hidden = false;
+  const ctx = c.getContext('2d');
+  c.width = innerWidth * devicePixelRatio; c.height = innerHeight * devicePixelRatio;
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+  const warna = ['#E0B04B', '#EAD9AE', '#5FB89A', '#F3D27A'];
+  const p = Array.from({ length: n }, () => ({
+    x: innerWidth / 2, y: innerHeight * .38, vx: (Math.random() - .5) * 9, vy: -Math.random() * 10 - 3,
+    w: 5 + Math.random() * 5, h: 8 + Math.random() * 8, r: Math.random() * 6, vr: (Math.random() - .5) * .3, w2: warna[Math.floor(Math.random() * warna.length)]
+  }));
+  const t0 = performance.now();
+  (function langkah(t) {
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    p.forEach(q => { q.vy += .32; q.x += q.vx; q.y += q.vy; q.r += q.vr; ctx.save(); ctx.translate(q.x, q.y); ctx.rotate(q.r); ctx.fillStyle = q.w2; ctx.fillRect(-q.w / 2, -q.h / 2, q.w, q.h); ctx.restore(); });
+    if (t - t0 < 2200) requestAnimationFrame(langkah); else { ctx.clearRect(0, 0, innerWidth, innerHeight); c.hidden = true; }
+  })(t0);
+}
+
+mulai();
+</script>
+</body>
+</html>
